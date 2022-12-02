@@ -116,17 +116,26 @@ int main()
 		startMenuRunningTime += dT;
 
 
-		if (startMenuRunningTime > (1 / 4)) {
-			startMenuFrame += window.width;
-			if (startMenuFrame >= window.width * 3) {
-				startMenuFrameChange = -window.width;
+		if (startMenuRunningTime >= player.updateTime)
+		{
+			startMenuRunningTime = 0;
+			//updates the sprite
+			startMenuFrame += startMenuFrameChange;
+			//reset frame and set sprite to middle animation to loop
+			if (startMenuFrame >= window.width * 3)
+			{
+				startMenuFrameChange = -1;
 			}
-			else if (startMenuFrame <= 0) {
-				startMenuFrameChange = window.width;
+			else if (startMenuFrame == startMenuFrame <= 0) {
+				startMenuFrameChange = 1;
 			}
 		}
+		BeginDrawing();
+		ClearBackground(WHITE);
+		DrawTextureEx(sMenuBg, {startMenuFrame,0 }, 0, 0, WHITE);
+		EndDrawing();
 
-		//if (startGame){
+		if (startGame){
 			while (!(WindowShouldClose()))//game
 			{
 				const float dT = GetFrameTime();
@@ -379,8 +388,8 @@ int main()
 
 
 				//draw background first
-				DrawTextureEx(bg, { BGposX,0 }, 0, (145 / 100), WHITE);
-				DrawTextureEx(bg, { BGposX + (bg.width * (145 / 100)),0 }, 0, (145 / 100), WHITE);
+				DrawTextureEx(bg, { BGposX,0 }, 0,0, WHITE);
+				DrawTextureEx(bg, { BGposX + (bg.width),0 }, 0, (145 / 100), WHITE);
 
 				for (int i = 0; i < numberOfBugs; i++)
 				{
@@ -404,9 +413,8 @@ int main()
 				}
 			}//while game
 
-			DrawTextureEx(lossBg, { 0,0 }, 0, (145 / 100), WHITE);
+			//DrawTextureEx(lossBg, { 0,0 }, 0, (145 / 100), WHITE);
 		}//if game
-		DrawTextureRec(sMenuBg, (Rectangle{ startMenuFrame, 0, 380, 512 }), (Vector2{ 0, 0 }), WHITE);
 
 	}//menu
 	UnloadTexture(sprite);
