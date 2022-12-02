@@ -61,21 +61,21 @@ int main()
 	int numberOfActivePlayerBullets = 0;
 	//sets the window dimensions
 	InitWindow(window.width, window.height, window.title);
-	Texture2D sprite = LoadTexture("C:/Users/a/Documents/gameAssets/rocketshipBlue(60x28).png");
+	Texture2D sprite = LoadTexture("gameAssets/rocketshipBlue(60x28).png");
 	//enemy texture
-	Texture2D defaultEnemySprite = LoadTexture("C:/Users/a/Documents/gameAssets/DefaultEnemy(33x35).png");
+	Texture2D defaultEnemySprite = LoadTexture("gameAssets/DefaultEnemy(33x35).png");
 	//backround texture
-	Texture2D bg = LoadTexture("C:/Users/a/Documents/gameAssets/spaceBG.png");
+	Texture2D bg = LoadTexture("gameAssets/spaceBG.png");
 	float BGposX = 0;
 	//player bullets texture
-	Texture2D playerBulletTexture = LoadTexture("C:/Users/a/Documents/gameAssets/projectiles/playerPellets.png");
+	Texture2D playerBulletTexture = LoadTexture("gameAssets/projectiles/playerPellets.png");
 
 	//player hearts 
-	Texture2D playerHeart = LoadTexture("C:/Users/a/Documents/gameAssets/wrench(21x21).png");
+	Texture2D playerHeart = LoadTexture("gameAssets/wrench(21x21).png");
 
-	Texture2D lossBg = LoadTexture("C:/Users/a/Documents/gameAssets/uLoseScreen.png");
+	Texture2D lossBg = LoadTexture("gameAssets/uLoseScreen.png");
 	
-	Texture2D sMenuBg = LoadTexture("C:/Users/a/Documents/gameAssets/startMenuLogo(512x380).png");
+	Texture2D sMenuBg = LoadTexture("gameAssets/startMenuLogo(512x380).png");
 
 	//gravity (pixels per frame per frame(quadratic))
 	const int gravity = 1000;
@@ -126,7 +126,7 @@ int main()
 			}
 		}
 
-		if (startGame){
+		//if (startGame){
 			while (!(WindowShouldClose()))//game
 			{
 				const float dT = GetFrameTime();
