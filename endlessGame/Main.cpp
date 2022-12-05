@@ -77,6 +77,8 @@ int main()
 	
 	Texture2D sMenuBg = LoadTexture("gameAssets/startMenuLogo(512x380).png");
 
+	Texture2D sMenuOptions = LoadTexture("gameAssets/startMenuOptions(189x127).png");
+
 	//gravity (pixels per frame per frame(quadratic))
 	const int gravity = 1000;
 	bool collision = false;
@@ -115,8 +117,7 @@ int main()
 		
 		startMenuRunningTime += dT;
 
-
-		if (startMenuRunningTime >= player.updateTime)
+		if (startMenuRunningTime >= 0.1)
 		{
 			startMenuRunningTime = 0;
 			//updates the sprite
@@ -124,15 +125,22 @@ int main()
 			//reset frame and set sprite to middle animation to loop
 			if (startMenuFrame >= window.width * 3)
 			{
-				startMenuFrameChange = -1;
+				startMenuFrameChange = -window.width;
 			}
-			else if (startMenuFrame == startMenuFrame <= 0) {
-				startMenuFrameChange = 1;
+			else if (startMenuFrame <= 0) {
+				startMenuFrameChange = window.width;
 			}
 		}
+		
+
+
 		BeginDrawing();
 		ClearBackground(WHITE);
-		DrawTextureEx(sMenuBg, {startMenuFrame,0 }, 0, 0, WHITE);
+		//DrawTextureEx(sMenuBg, {startMenuFrame,0 }, 0, 145/100, WHITE);
+		//doesnt work as a bg so i drew it as a sprite
+		DrawTextureRec(sMenuBg, (Rectangle{ startMenuFrame, 0, 676, 380 }), (Vector2{ 0, 0 }), WHITE);
+		DrawTextureRec(sMenuBg, (Rectangle{ startMenuFrame, 0, 676, 380 }), (Vector2{ 0, 0 }), WHITE);
+
 		EndDrawing();
 
 		if (startGame){
@@ -381,15 +389,15 @@ int main()
 				}
 
 				BGposX -= 40 * dT;
-				if (BGposX <= -(bg.width * 145 / 100))
+				if (BGposX <= -(window.width*1.45))
 				{
 					BGposX = 0;
 				}
 
 
 				//draw background first
-				DrawTextureEx(bg, { BGposX,0 }, 0,0, WHITE);
-				DrawTextureEx(bg, { BGposX + (bg.width),0 }, 0, (145 / 100), WHITE);
+				DrawTextureEx(bg, { BGposX,0 }, 0,145/100, WHITE);
+				DrawTextureEx(bg, { (BGposX+(bg.width*(145/100))),0 }, 0, (145 / 100), WHITE);
 
 				for (int i = 0; i < numberOfBugs; i++)
 				{
@@ -421,6 +429,9 @@ int main()
 	UnloadTexture(defaultEnemySprite);
 	UnloadTexture(bg);
 	UnloadTexture(playerBulletTexture);
+	UnloadTexture(playerHeart);
+	UnloadTexture(lossBg);
+	UnloadTexture(sMenuBg);
 	CloseWindow();//use this to properly close the window
 
 
