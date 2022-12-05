@@ -111,6 +111,8 @@ int main()
 	float startMenuRunningTime = 0;
 	float startMenuFrame = 0;
 	int startMenuFrameChange = window.width;
+	float sMenuOptionSelected = 0;
+	int sMenuOptionWidth = 189;
 	SetTargetFPS(60);
 	while (!(WindowShouldClose())) {//menu
 		const float dT = GetFrameTime();
@@ -132,14 +134,38 @@ int main()
 			}
 		}
 		
+		if ((IsKeyPressed(KEY_DOWN))or (IsKeyPressed(KEY_S))) {
 
+			sMenuOptionSelected += sMenuOptionWidth;
+
+		}
+		if ((IsKeyPressed(KEY_UP)) or (IsKeyPressed(KEY_W))) {
+
+			sMenuOptionSelected -= sMenuOptionWidth;
+
+		}
+		if ((IsKeyPressed(KEY_SPACE)) or (IsKeyPressed(KEY_ENTER))) {
+			int optionSelected = (sMenuOptionSelected / 189) + 1;
+
+			if (optionSelected == 1) {
+				startGame = true;
+			}
+			else if (optionSelected == 2) {
+
+			}
+			else if (optionSelected == 3) {
+				break;
+			}
+
+
+		}
 
 		BeginDrawing();
 		ClearBackground(WHITE);
 		//DrawTextureEx(sMenuBg, {startMenuFrame,0 }, 0, 145/100, WHITE);
 		//doesnt work as a bg so i drew it as a sprite
 		DrawTextureRec(sMenuBg, (Rectangle{ startMenuFrame, 0, 676, 380 }), (Vector2{ 0, 0 }), WHITE);
-		DrawTextureRec(sMenuBg, (Rectangle{ startMenuFrame, 0, 676, 380 }), (Vector2{ 0, 0 }), WHITE);
+		DrawTextureRec(sMenuOptions, (Rectangle{ sMenuOptionSelected, 0, 189, 127 }), (Vector2{ 290, 240 }), WHITE);
 
 		EndDrawing();
 
