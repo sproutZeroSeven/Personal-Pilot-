@@ -69,7 +69,7 @@ struct enemyShip {
 	//has gotten a point from the enemy
 	bool isScored = false;
 	bool homing = false;
-}enemyShip;
+}enemyShipDefault;
 
 
 struct bullets {
@@ -94,13 +94,15 @@ int main()
 	int numberOfActivePlayerBullets = 0;
 	//sets the window dimensions
 	InitWindow(window.width, window.height, window.title);
-	Texture2D sprite = LoadTexture("gameAssets/rocketshipBlue(60x28).png");
+	Texture2D sprite = LoadTexture("gameAssets/playerShips/rocketshipBlue(60x28).png");
 	//enemy texture
 
-	Texture2D defaultEnemySpritePink = LoadTexture("gameAssets/defaultEnemy/defaultEnemyPink(33x35).png");	
-	Texture2D defaultEnemySpriteYellow = LoadTexture("gameAssets/defaultEnemy/defaultEnemyYellow(33x35).png");
-	Texture2D defaultEnemySpriteBlue = LoadTexture("gameAssets/defaultEnemy/defaultEnemyBlue(33x35).png");
-	Texture2D defaultEnemySpriteGreen = LoadTexture("gameAssets/defaultEnemy/defaultEnemyGreen(33x35).png");
+	Texture2D defaultEnemySpritePink = LoadTexture("gameAssets/enemies/defaultEnemy/defaultEnemyPink(33x35).png");	
+	Texture2D defaultEnemySpriteYellow = LoadTexture("gameAssets/enemies/defaultEnemy/defaultEnemyYellow(33x35).png");
+	Texture2D defaultEnemySpriteBlue = LoadTexture("gameAssets/enemies/defaultEnemy/defaultEnemyBlue(33x35).png");
+	Texture2D defaultEnemySpriteGreen = LoadTexture("gameAssets/enemies/defaultEnemy/defaultEnemyGreen(33x35).png");
+
+	Texture2D enemyShipSprite = LoadTexture("gameAssets/enemies/enemySpaceShip/enemySpaceship(63x24).png");
 
 
 	//backround texture
@@ -114,14 +116,13 @@ int main()
 
 	Texture2D lossBg = LoadTexture("gameAssets/uLoseScreen.png");
 	
-	Texture2D sMenuBg = LoadTexture("gameAssets/startMenuLogo(512x380).png");
+	Texture2D sMenuBg = LoadTexture("gameAssets/menus/startMenu/logo(512x380).png");
 
-	Texture2D sMenuOptions = LoadTexture("gameAssets/startMenuOptions(189x127).png");
+	Texture2D sMenuOptions = LoadTexture("gameAssets/menus/startMenu/options(189x127).png");
 
 	//gravity (pixels per frame per frame(quadratic))
-	const int gravity = 1000;
 	bool collision = false;
-	const int numberOfBugs = 8;
+	const int numberOfBugs = 12;
 	character bugs[numberOfBugs];
 	srand(time(0));
 	//updates bugs locations
@@ -130,15 +131,30 @@ int main()
 		//set to template
 		bugs[i].width = 33;
 		bugs[i].height = 35;
-		bugs[i].frame = 0;
+		bugs[i].frame = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (5)));
 		bugs[i].currentSprite = 0;
-		bugs[i].maxFrame = 2;
-		bugs[i].startFrame = 0;
-		bugs[i].updateTime = 1.0 / 8.0;
+		bugs[i].updateTime = 1.0 / ((static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (3))) + 6);
 		bugs[i].posY = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (window.height - bugs[1].width - 10)));
-		bugs[i].Xvelocity = -(static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 75)) - 50;
+		bugs[i].Xvelocity = -(static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 50)) - 50;
 		bugs[i].hp = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (4))) +1;
 		bugs[i].posX += 300 * i;
+	}
+	const int numberOFEnemyShips = 12;
+	enemyShip enemyShips[numberOFEnemyShips];
+
+	for (int i = 0; i < numberOFEnemyShips; i++) {
+		//set to template
+		enemyShips[i].width = 63;
+		enemyShips[i].height = 24;
+		enemyShips[i].frame = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (5)));
+		enemyShips[i].currentSprite = 0;
+		enemyShips[i].updateTime = 1.0 / ((static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (2)))+5);
+		enemyShips[i].posY = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (window.height - bugs[1].width - 10)));
+		enemyShips[i].Xvelocity = -(static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 50)) - 25;
+		enemyShips[i].hp = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (4))) + 1;
+		enemyShips[i].posX += 300 * i + 300;
+
+
 	}
 
 	const int numberOfPlayerBullets = 24;
@@ -242,7 +258,12 @@ int main()
 						bugs[i].posX += bugs[i].Xvelocity * dT;
 					}
 				}
-				//moves player
+				//moves enemy ships
+				for (int i = 0; i < numberOFEnemyShips; i++) {
+					enemyShips[i].posX += enemyShips[i].Xvelocity *dT;
+				}
+
+				//moves bullets
 				for (int i = 0; i < numberOfPlayerBullets; i++)
 				{
 					playerBullets[i].posX += playerBullets[i].Xvelocity * dT;
@@ -340,7 +361,6 @@ int main()
 				};
 
 
-
 				for (int i = 0; i < numberOfBugs; i++) {
 
 
@@ -361,7 +381,7 @@ int main()
 						if ((CheckCollisionRecs(bugBodyrec, playerLengthRec) or CheckCollisionRecs(bugBodyrec, playerBackWingRec) or CheckCollisionRecs(bugBodyrec, playerFrontWingRec)) or (CheckCollisionRecs(bugAntennaRec, playerLengthRec) or CheckCollisionRecs(bugAntennaRec, playerBackWingRec) or CheckCollisionRecs(bugAntennaRec, playerFrontWingRec))) {
 							collision = true;
 							player.hp -= 1;
-							bugs[i].currentSprite = 6 * 33;
+							bugs[i].currentSprite = 6 * bugs[i].width;
 							bugs[i].hp = 0;
 							bugs[i].Xvelocity = 0;
 							bugs[i].frame = 0;
@@ -405,6 +425,9 @@ int main()
 				for (int i = 0; i < numberOfBugs; i++) {
 					bugs[i].runningTime += dT;
 				}
+				for (int i = 0; i < numberOFEnemyShips; i++) {
+					enemyShips[i].runningTime += dT;
+				}
 				if (player.runningTime >= player.updateTime)
 				{
 					player.runningTime = 0;
@@ -422,7 +445,7 @@ int main()
 						player.frame = 0;
 					}
 				}
-
+				
 				for (int i = 0; i < numberOfBugs; i++) {
 					if (bugs[i].runningTime > bugs[i].updateTime)
 					{
@@ -460,12 +483,29 @@ int main()
 					}
 				}
 
+				for (int i = 0; i < numberOFEnemyShips; i++) {
+					if (enemyShips[i].runningTime > enemyShips[i].updateTime) {
+						enemyShips[i].runningTime = 0;
+						if (!enemyShips[i].isDead) {
+							//updates the sprite
+							enemyShips[i].currentSprite = enemyShips[i].frame * enemyShips[i].width;
+							enemyShips[i].frame += enemyShips[i].frameUpdater;
+							if ((enemyShips[i].frame == 4) and (enemyShips[i].frameUpdater == 1))
+							{
+								enemyShips[i].frameUpdater = -1;
+							}
+							else if ((enemyShips[i].frame == 0) and (enemyShips[i].frameUpdater == -1)) {
+								enemyShips[i].frameUpdater = 1;
+							}
+						}
+					}
+				}
+
 				BGposX -= 40 * dT;
-				if (BGposX <= -(window.width * 1.45))
+				if (BGposX <= -(676))
 				{
 					BGposX = 0;
 				}
-
 
 				//draw background first
 				DrawTextureEx(bg, { BGposX,0 }, 0, 145 / 100, WHITE);
@@ -486,6 +526,11 @@ int main()
 						DrawTextureRec(defaultEnemySpriteGreen, (Rectangle{ bugs[i].currentSprite, 0, bugs[i].width, bugs[i].height }), (Vector2{ bugs[i].posX,bugs[i].posY }), WHITE);
 					}
 				}
+				for (int i = 0; i < numberOFEnemyShips; i++) {
+					DrawTextureRec(enemyShipSprite, (Rectangle{ enemyShips[i].currentSprite, 0, enemyShips[i].width, enemyShips[i].height }), (Vector2{ enemyShips[i].posX,enemyShips[i].posY }), WHITE);
+
+				}
+
 				for (int i = 0; i < numberOfPlayerBullets; i++)
 				{
 					DrawTextureRec(playerBulletTexture, (Rectangle{ playerBullets[i].currentSprite, 0, playerBullets[i].width, playerBullets[i].height }), (Vector2{ playerBullets[i].posX,playerBullets[i].posY }), WHITE);
@@ -526,6 +571,10 @@ int main()
 	}//menu
 	UnloadTexture(sprite);
 	UnloadTexture(defaultEnemySpriteGreen);
+	UnloadTexture(defaultEnemySpriteBlue);
+	UnloadTexture(defaultEnemySpritePink);
+	UnloadTexture(defaultEnemySpriteYellow);
+	UnloadTexture(enemyShipSprite);
 	UnloadTexture(bg);
 	UnloadTexture(playerBulletTexture);
 	UnloadTexture(playerHeart);
