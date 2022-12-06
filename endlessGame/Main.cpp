@@ -1,6 +1,7 @@
 #include "raylib.h"  
 #include <time.h>  
 #include <iostream>
+#include "string"
 
 //structs
 struct Window {
@@ -37,7 +38,39 @@ struct character {
 	int frameUpdater = 1;
 	//is dead 
 	bool isDead = false;
+	//has gotten a point from the enemy
+	bool isScored = false;
 }player, bug;
+
+struct enemyShip {
+	
+	//set dimensions
+	float width = 60;//updated to match width of single sprite
+	float height = 28;//manually determined the height
+	int hp = 3;
+
+	float Yvelocity = 0;
+	float Xvelocity = 0;
+	float baseVelocity = 300;
+	float posY = 0;
+	float posX = 0;
+
+	//animation data
+
+	int frame = 2;
+	int startFrame = 2;
+	int maxFrame = 5;
+	float currentSprite = 162;
+	float updateTime = 1.0 / 4.0;
+	float runningTime = 0;
+	int frameUpdater = 1;
+	//is dead 
+	bool isDead = false;
+	//has gotten a point from the enemy
+	bool isScored = false;
+	bool homing = false;
+}enemyShip;
+
 
 struct bullets {
 	//set dimensions
@@ -63,7 +96,13 @@ int main()
 	InitWindow(window.width, window.height, window.title);
 	Texture2D sprite = LoadTexture("gameAssets/rocketshipBlue(60x28).png");
 	//enemy texture
-	Texture2D defaultEnemySprite = LoadTexture("gameAssets/DefaultEnemy(33x35).png");
+
+	Texture2D defaultEnemySpritePink = LoadTexture("gameAssets/defaultEnemy/defaultEnemyPink(33x35).png");	
+	Texture2D defaultEnemySpriteYellow = LoadTexture("gameAssets/defaultEnemy/defaultEnemyYellow(33x35).png");
+	Texture2D defaultEnemySpriteBlue = LoadTexture("gameAssets/defaultEnemy/defaultEnemyBlue(33x35).png");
+	Texture2D defaultEnemySpriteGreen = LoadTexture("gameAssets/defaultEnemy/defaultEnemyGreen(33x35).png");
+
+
 	//backround texture
 	Texture2D bg = LoadTexture("gameAssets/spaceBG.png");
 	float BGposX = 0;
@@ -98,6 +137,7 @@ int main()
 		bugs[i].updateTime = 1.0 / 8.0;
 		bugs[i].posY = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (window.height - bugs[1].width - 10)));
 		bugs[i].Xvelocity = -(static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 75)) - 50;
+		bugs[i].hp = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (4))) +1;
 		bugs[i].posX += 300 * i;
 	}
 
@@ -108,11 +148,10 @@ int main()
 	{
 		playerBullets[i].currentSprite = i * 8;
 	}
-	float startMenuRunningTime = 0;
-	float startMenuFrame = 0;
-	int startMenuFrameChange = window.width;
-	float sMenuOptionSelected = 0;
-	int sMenuOptionWidth = 189;
+
+	float startMenuFrame = 0, sMenuOptionSelected = 0, startMenuRunningTime = 0;
+	int startMenuFrameChange = window.width, sMenuOptionWidth = 189, score = 0;
+
 	SetTargetFPS(60);
 	while (!(WindowShouldClose())) {//menu
 		const float dT = GetFrameTime();
@@ -196,12 +235,14 @@ int main()
 					}
 				}
 
-				//draw bugs 
+				//moves bugs
 				for (int i = 0; i < numberOfBugs; i++)
-				{
-					bugs[i].posX += bugs[i].Xvelocity * dT;
+				{	
+					if (!bugs[i].isDead) {
+						bugs[i].posX += bugs[i].Xvelocity * dT;
+					}
 				}
-				//draw player 
+				//moves player
 				for (int i = 0; i < numberOfPlayerBullets; i++)
 				{
 					playerBullets[i].posX += playerBullets[i].Xvelocity * dT;
@@ -321,9 +362,11 @@ int main()
 							collision = true;
 							player.hp -= 1;
 							bugs[i].currentSprite = 6 * 33;
+							bugs[i].hp = 0;
 							bugs[i].Xvelocity = 0;
 							bugs[i].frame = 0;
 							bugs[i].isDead = true;
+							bugs[i].isScored = true;
 
 						}
 						else {
@@ -335,14 +378,17 @@ int main()
 									playerBullets[e].height
 								};
 								if ((CheckCollisionRecs(playerBulletRec, bugBodyrec) or (CheckCollisionRecs(playerBulletRec, bugAntennaRec)))) {
-									bugs[i].currentSprite = 6 * 33;
-									bugs[i].Xvelocity = 0;
-									bugs[i].frame = 0;
 									playerBullets[e].inStorage = true;
 									playerBullets[e].posX = 700;
 									playerBullets[e].posY = 700;
 									playerBullets[e].Xvelocity = 0;
-									bugs[i].isDead = true;
+									bugs[i].hp -= 1;
+									if (bugs[i].hp == 0) {
+										bugs[i].isDead = true;
+										bugs[i].currentSprite = 6 * 33;
+										bugs[i].Xvelocity = 0;
+										bugs[i].frame = 0;
+									}
 								}
 
 							}
@@ -415,31 +461,58 @@ int main()
 				}
 
 				BGposX -= 40 * dT;
-				if (BGposX <= -(window.width*1.45))
+				if (BGposX <= -(window.width * 1.45))
 				{
 					BGposX = 0;
 				}
 
 
 				//draw background first
-				DrawTextureEx(bg, { BGposX,0 }, 0,145/100, WHITE);
-				DrawTextureEx(bg, { (BGposX+(bg.width*(145/100))),0 }, 0, (145 / 100), WHITE);
+				DrawTextureEx(bg, { BGposX,0 }, 0, 145 / 100, WHITE);
+				DrawTextureEx(bg, { (BGposX + (bg.width * (145 / 100))),0 }, 0, (145 / 100), WHITE);
 
 				for (int i = 0; i < numberOfBugs; i++)
 				{
-					DrawTextureRec(defaultEnemySprite, (Rectangle{ bugs[i].currentSprite, 0, bugs[i].width, bugs[i].height }), (Vector2{ bugs[i].posX,bugs[i].posY }), WHITE);
+					if (bugs[i].hp == 4) {
+						DrawTextureRec(defaultEnemySpritePink, (Rectangle{ bugs[i].currentSprite, 0, bugs[i].width, bugs[i].height }), (Vector2{ bugs[i].posX,bugs[i].posY }), WHITE);
+					}
+					else if (bugs[i].hp == 3) {
+						DrawTextureRec(defaultEnemySpriteYellow, (Rectangle{ bugs[i].currentSprite, 0, bugs[i].width, bugs[i].height }), (Vector2{ bugs[i].posX,bugs[i].posY }), WHITE);
+					}
+					else if (bugs[i].hp == 2) {
+						DrawTextureRec(defaultEnemySpriteBlue, (Rectangle{ bugs[i].currentSprite, 0, bugs[i].width, bugs[i].height }), (Vector2{ bugs[i].posX,bugs[i].posY }), WHITE);
+					}
+					else if (bugs[i].hp == 1) {
+						DrawTextureRec(defaultEnemySpriteGreen, (Rectangle{ bugs[i].currentSprite, 0, bugs[i].width, bugs[i].height }), (Vector2{ bugs[i].posX,bugs[i].posY }), WHITE);
+					}
 				}
 				for (int i = 0; i < numberOfPlayerBullets; i++)
 				{
 					DrawTextureRec(playerBulletTexture, (Rectangle{ playerBullets[i].currentSprite, 0, playerBullets[i].width, playerBullets[i].height }), (Vector2{ playerBullets[i].posX,playerBullets[i].posY }), WHITE);
 				}
+				DrawTextureRec(sprite, (Rectangle{ player.currentSprite, 0, player.width, player.height }), (Vector2{ player.posX, player.posY }), WHITE);
+				DrawCircle(player.posX, player.posY, 1, PINK);
+
+
+				//ui stuff (needs to be above shiiiiitttt
+				for (int i = 0; i < numberOfBugs; i++) {
+					if (bugs[i].isDead) {
+						if (!bugs[i].isScored){
+							score += 50;
+							bugs[i].isScored = true;
+						}
+						//DrawText(text, x, y, fontSize, Color)
+						DrawText("50", (bugs[i].posX - 10), (bugs[i].posY - 5), 17, YELLOW);
+					}
+				}
 				for (int i = 0; i < player.hp; i++) {
 					float displacement = (12 + 27 * i);
 					DrawTextureRec(playerHeart, (Rectangle{ 0, 0, 21, 21 }), (Vector2{ displacement, 12 }), WHITE);
 				}
-				DrawTextureRec(sprite, (Rectangle{ player.currentSprite, 0, player.width, player.height }), (Vector2{ player.posX, player.posY }), WHITE);
-				void DrawTextureRec(Texture2D texture, Rectangle source, Vector2 position, Color tint);
-				DrawCircle(player.posX, player.posY, 1, PINK);
+
+				char textScore[6] = "score";
+				DrawText(TextFormat("Score: %08i", score), 300, 5, 26, RED);
+
 				EndDrawing();
 
 				if (player.hp <= 0) {
@@ -452,7 +525,7 @@ int main()
 
 	}//menu
 	UnloadTexture(sprite);
-	UnloadTexture(defaultEnemySprite);
+	UnloadTexture(defaultEnemySpriteGreen);
 	UnloadTexture(bg);
 	UnloadTexture(playerBulletTexture);
 	UnloadTexture(playerHeart);
