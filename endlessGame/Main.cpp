@@ -357,7 +357,7 @@ int main()
 						12
 					};
 
-					if (!bugs[i].isDead)
+					if (!bugs[i].isDead) {
 						if ((CheckCollisionRecs(bugBodyrec, playerLengthRec) or CheckCollisionRecs(bugBodyrec, playerBackWingRec) or CheckCollisionRecs(bugBodyrec, playerFrontWingRec)) or (CheckCollisionRecs(bugAntennaRec, playerLengthRec) or CheckCollisionRecs(bugAntennaRec, playerBackWingRec) or CheckCollisionRecs(bugAntennaRec, playerFrontWingRec))) {
 							collision = true;
 							player.hp -= 1;
@@ -383,9 +383,9 @@ int main()
 									playerBullets[e].posY = 700;
 									playerBullets[e].Xvelocity = 0;
 									bugs[i].hp -= 1;
-									if (bugs[i].hp == 0) {
+									if (bugs[i].hp <= 0) {
 										bugs[i].isDead = true;
-										bugs[i].currentSprite = 6 * 33;
+										bugs[i].currentSprite = 6 * bugs[i].width;
 										bugs[i].Xvelocity = 0;
 										bugs[i].frame = 0;
 									}
@@ -393,7 +393,7 @@ int main()
 
 							}
 						}
-
+					}
 				}
 
 
