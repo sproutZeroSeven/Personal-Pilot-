@@ -69,6 +69,10 @@ struct enemyShip {
 	//has gotten a point from the enemy
 	bool isScored = false;
 	bool homing = false;
+	
+	//shooting
+	int shootFrame;
+	int frameCounter;
 }enemyShipDefault;
 
 
@@ -86,7 +90,7 @@ struct bullets {
 	
 	//sent off screen
 	bool inStorage = true;
-} playerBullet;
+} playerBullet, enemyBullet;
 
 int main()
 {
@@ -151,8 +155,10 @@ int main()
 		enemyShips[i].updateTime = 1.0 / ((static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (2)))+5);
 		enemyShips[i].posY = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (window.height - bugs[1].width - 10)));
 		enemyShips[i].Xvelocity = -(static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 50)) - 25;
-		enemyShips[i].hp = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (4))) + 1;
+		enemyShips[i].hp = ((static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (4))) + 1);
 		enemyShips[i].posX += 300 * i + 300;
+		enemyShips[i].shootFrame +=( (static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (4))) + 4);
+
 
 
 	}
@@ -483,6 +489,7 @@ int main()
 					}
 				}
 
+				//enemy ship animations + shooting
 				for (int i = 0; i < numberOFEnemyShips; i++) {
 					if (enemyShips[i].runningTime > enemyShips[i].updateTime) {
 						enemyShips[i].runningTime = 0;
@@ -490,6 +497,10 @@ int main()
 							//updates the sprite
 							enemyShips[i].currentSprite = enemyShips[i].frame * enemyShips[i].width;
 							enemyShips[i].frame += enemyShips[i].frameUpdater;
+							enemyShips[i].frameCounter++;
+							if ((enemyShips[i].frameCounter % enemyShips[i].shootFrame) == 0) {
+								
+							}
 							if ((enemyShips[i].frame == 4) and (enemyShips[i].frameUpdater == 1))
 							{
 								enemyShips[i].frameUpdater = -1;
@@ -500,6 +511,8 @@ int main()
 						}
 					}
 				}
+
+
 
 				BGposX -= 40 * dT;
 				if (BGposX <= -(676))
