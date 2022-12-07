@@ -520,11 +520,8 @@ int main()
 									playerBullets[e].Xvelocity = 0;
 									enemyShips[i].isDead = true;
 									//enemyShips[i].currentSprite = 6 * bugs[i].width;       //update for death animation
-									enemyShips[i].posX = 700;
-									enemyShips[i].posY = 700;
 									enemyShips[i].Xvelocity = 0;
 									enemyShips[i].frame = 0;
-
 								}
 
 							}
@@ -709,6 +706,23 @@ int main()
 						DrawText("50", (bugs[i].posX - 10), (bugs[i].posY - 5), 17, YELLOW);
 					}
 				}
+
+				for (int i = 0; i < numberOFEnemyShips; i++) {
+
+					if (enemyShips[i].isDead) {
+						if (!enemyShips[i].isScored) {
+							score += 100;
+							enemyShips[i].isScored = true;
+
+						}
+						//DrawText(text, x, y, fontSize, Color)
+						//DrawText("50", (bugs[i].posX - 10), (bugs[i].posY - 5), 17, YELLOW);
+
+						DrawText("100", (enemyShips[i].posX - 10), (enemyShips[i].posY - 5), 17, YELLOW);
+					}
+				}
+
+
 				for (int i = 0; i < player.hp; i++) {
 					float displacement = (12 + 27 * i);
 					DrawTextureRec(playerHeart, (Rectangle{ 0, 0, 21, 21 }), (Vector2{ displacement, 12 }), WHITE);
@@ -720,6 +734,7 @@ int main()
 				EndDrawing();
 
 				if (player.hp <= 0) {
+					startGame = false;
 					break;
 				}
 			}//while game
