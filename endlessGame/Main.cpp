@@ -95,7 +95,7 @@ struct bullets {
 int main()
 {
 	bool startGame = false;
-	int numberOfActivePlayerBullets = 0;
+	int numberOfActivePlayerBullets = 0, numberOfActiveEnemyBullets = 0;
 	//sets the window dimensions
 	InitWindow(window.width, window.height, window.title);
 	Texture2D sprite = LoadTexture("gameAssets/playerShips/rocketshipBlue(60x28).png");
@@ -113,7 +113,8 @@ int main()
 	Texture2D bg = LoadTexture("gameAssets/spaceBG.png");
 	float BGposX = 0;
 	//player bullets texture
-	Texture2D playerBulletTexture = LoadTexture("gameAssets/projectiles/playerPellets.png");
+	Texture2D playerBulletTexture = LoadTexture("gameAssets/projectiles/playerPellets(8x6).png");
+	Texture2D enemyBulletTexture = LoadTexture("gameAssets/projectiles/enemyPellet(12x12).png");
 
 	//player hearts 
 	Texture2D playerHeart = LoadTexture("gameAssets/wrench(21x21).png");
@@ -124,8 +125,6 @@ int main()
 
 	Texture2D sMenuOptions = LoadTexture("gameAssets/menus/startMenu/options(189x127).png");
 
-	//gravity (pixels per frame per frame(quadratic))
-	bool collision = false;
 	const int numberOfBugs = 12;
 	character bugs[numberOfBugs];
 	srand(time(0));
@@ -155,9 +154,8 @@ int main()
 		enemyShips[i].updateTime = 1.0 / ((static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (2)))+5);
 		enemyShips[i].posY = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (window.height - bugs[1].width - 10)));
 		enemyShips[i].Xvelocity = -(static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 50)) - 25;
-		enemyShips[i].hp = ((static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (4))) + 1);
 		enemyShips[i].posX += 300 * i + 300;
-		enemyShips[i].shootFrame +=( (static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (4))) + 4);
+		enemyShips[i].shootFrame =((static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (4))) + 2);
 
 
 
@@ -173,6 +171,18 @@ int main()
 
 	float startMenuFrame = 0, sMenuOptionSelected = 0, startMenuRunningTime = 0;
 	int startMenuFrameChange = window.width, sMenuOptionWidth = 189, score = 0;
+
+
+	const int numberOfEnemyBullets = 40;
+
+	bullets enemyBullets[numberOfEnemyBullets];
+	for (int i = 0; i < numberOfEnemyBullets; i++)
+	{
+		enemyBullets[i].height = 12;
+		enemyBullets[i].width = 12;
+		enemyBullets[i].baseVelocity = 250;
+	}
+
 
 	SetTargetFPS(60);
 	while (!(WindowShouldClose())) {//menu
@@ -247,13 +257,39 @@ int main()
 						playerBullets[i].posY = 700;
 					}
 				}
+
+				//catches enemy bullets at the start of the window and sends them off screen with no velocity as dead
+				for (int i = 0; i < numberOfEnemyBullets; i++) {
+					if (!(enemyBullets[i].inStorage) and (enemyBullets[i].posX <= -40)) {
+						enemyBullets[i].Xvelocity = 0;
+						enemyBullets[i].posX = 700;
+						enemyBullets[i].posY = 700;
+						enemyBullets[i].inStorage = true;
+					}
+				}
+				//catches enemyships at the start of the window and sends them off screen with no velocity as dead
+				for (int i = 0; i < numberOFEnemyShips; i++) {
+					if (!(enemyShips[i].isDead) and (enemyShips[i].posX <= -140)) {
+						enemyShips[i].Xvelocity = -(static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 50)) - 50;
+						enemyShips[i].posX = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX / ((1000 / (score+1) + 1) *window.width))) + window.width;
+						enemyShips[i].posY = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (window.height - enemyShips[1].width - 10)));
+						enemyShips[i].isDead = false;
+						enemyShips[i].shootFrame += ((static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (6))) + 4);
+						enemyShips[i].isScored = false;
+
+					}
+				}
 				//catches bugs at the start of the window and sends them off screen with no velocity as dead
 				for (int i = 0; i < numberOfBugs; i++) {
-					if (!(bugs[i].isDead) and (bugs[i].posX <= -40)) {
-						bugs[i].Xvelocity = -300;
-						bugs[i].posX = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (window.width))) + window.width;
+					if ((bugs[i].isDead) or (bugs[i].posX <= -40)) {
+						bugs[i].Xvelocity = -(static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 50)) - 50;
+						bugs[i].posX = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX / ((1000/(score+1) +1)*window.width))) + window.width;
 						bugs[i].posY = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (window.height - bugs[1].width - 10)));
 						bugs[i].isDead = false;
+						bugs[i].hp = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (4))) + 1;
+						bugs[i].frame = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (5)));
+						bugs[i].currentSprite = 0;
+						bugs[i].isScored = false;
 					}
 				}
 
@@ -275,6 +311,11 @@ int main()
 					playerBullets[i].posX += playerBullets[i].Xvelocity * dT;
 				}
 
+				//moves enemy Bullets
+				for (int i = 0; i < numberOfEnemyBullets; i++)
+				{
+					enemyBullets[i].posX -= enemyBullets[i].Xvelocity * dT;
+				}
 
 				if (player.posY >= window.height - player.height)
 				{
@@ -345,6 +386,13 @@ int main()
 					}
 				}
 
+				if ((IsKeyPressed(KEY_ESCAPE))) {
+					bool looping = true;
+					while (looping) {
+						
+					}
+				}
+
 
 				//player box colliders
 				Rectangle playerFrontWingRec{
@@ -385,7 +433,6 @@ int main()
 
 					if (!bugs[i].isDead) {
 						if ((CheckCollisionRecs(bugBodyrec, playerLengthRec) or CheckCollisionRecs(bugBodyrec, playerBackWingRec) or CheckCollisionRecs(bugBodyrec, playerFrontWingRec)) or (CheckCollisionRecs(bugAntennaRec, playerLengthRec) or CheckCollisionRecs(bugAntennaRec, playerBackWingRec) or CheckCollisionRecs(bugAntennaRec, playerFrontWingRec))) {
-							collision = true;
 							player.hp -= 1;
 							bugs[i].currentSprite = 6 * bugs[i].width;
 							bugs[i].hp = 0;
@@ -421,6 +468,90 @@ int main()
 						}
 					}
 				}
+
+
+
+				for (int i = 0; i < numberOFEnemyShips; i++) {
+
+					//enemyShip box colliders
+					Rectangle enemyShipFrontWingRec{
+						enemyShips[i].posX + 32,
+						enemyShips[i].posY + 6,
+						4,
+						enemyShips[i].height - 6
+					};									////values need to be changed
+					Rectangle enemyShipBackWingRec{
+						enemyShips[i].posX + 14,
+						enemyShips[i].posY + 1,
+						9,
+						18
+					};
+					Rectangle enemyShipLengthRec{
+						enemyShips[i].posX,
+						enemyShips[i].posY + 9,
+						enemyShips[i].width,
+						10
+					};
+
+
+					if (!bugs[i].isDead) {
+						if ((CheckCollisionRecs(enemyShipFrontWingRec, playerLengthRec) or CheckCollisionRecs(enemyShipFrontWingRec, playerBackWingRec) or CheckCollisionRecs(enemyShipFrontWingRec, playerFrontWingRec)) or (CheckCollisionRecs(enemyShipBackWingRec, playerLengthRec) or CheckCollisionRecs(enemyShipBackWingRec, playerBackWingRec) or CheckCollisionRecs(enemyShipBackWingRec, playerFrontWingRec)) or (CheckCollisionRecs(enemyShipLengthRec, playerLengthRec) or CheckCollisionRecs(enemyShipLengthRec, playerBackWingRec) or CheckCollisionRecs(enemyShipLengthRec, playerFrontWingRec))) {
+							player.hp -= 1;
+							bugs[i].currentSprite = 6 * bugs[i].width;
+							bugs[i].hp = 0;
+							bugs[i].Xvelocity = 0;
+							bugs[i].frame = 0;
+							bugs[i].isDead = true;
+							bugs[i].isScored = true;
+
+						}
+						else {
+							for (int e = 0; e < numberOfPlayerBullets; e++) {
+								Rectangle playerBulletRec{
+									playerBullets[e].posX,
+									playerBullets[e].posY,
+									playerBullets[e].width,
+									playerBullets[e].height
+								};
+								if ((CheckCollisionRecs(playerBulletRec, enemyShipLengthRec)) or (CheckCollisionRecs(playerBulletRec, enemyShipBackWingRec)) or (CheckCollisionRecs(playerBulletRec, enemyShipFrontWingRec))) {
+									playerBullets[e].inStorage = true;
+									playerBullets[e].posX = 700;
+									playerBullets[e].posY = 700;
+									playerBullets[e].Xvelocity = 0;
+									enemyShips[i].isDead = true;
+									//enemyShips[i].currentSprite = 6 * bugs[i].width;       //update for death animation
+									enemyShips[i].posX = 700;
+									enemyShips[i].posY = 700;
+									enemyShips[i].Xvelocity = 0;
+									enemyShips[i].frame = 0;
+
+								}
+
+							}
+						}
+					}
+				}
+
+				for (int i = 0; i < numberOfEnemyBullets; i++) {
+					if (!enemyBullets[i].inStorage) {
+						Rectangle enemyBulletRec{
+						   (enemyBullets[i].posX + 1),
+						   (enemyBullets[i].posY + 1),
+						   (enemyBullets[i].width - 2),
+						   (enemyBullets[i].height - 2)
+						};
+
+						if ((CheckCollisionRecs(enemyBulletRec, playerFrontWingRec)) or (CheckCollisionRecs(enemyBulletRec, playerBackWingRec)) or (CheckCollisionRecs(enemyBulletRec, playerLengthRec))) {
+							enemyBullets[i].inStorage = true;
+							enemyBullets[i].posX = 700;
+							enemyBullets[i].posY = 700;
+							enemyBullets[i].Xvelocity = 0;
+							player.hp -= 1;
+						}
+					}
+				}
+
+
 
 
 				player.posY -= player.Yvelocity * dT;
@@ -498,8 +629,19 @@ int main()
 							enemyShips[i].currentSprite = enemyShips[i].frame * enemyShips[i].width;
 							enemyShips[i].frame += enemyShips[i].frameUpdater;
 							enemyShips[i].frameCounter++;
-							if ((enemyShips[i].frameCounter % enemyShips[i].shootFrame) == 0) {
-								
+							if ((enemyShips[i].posX < (window.width +10)) and (enemyShips[i].frameCounter % enemyShips[i].shootFrame) == 0) {
+									if (numberOfActiveEnemyBullets == numberOfEnemyBullets) {
+										numberOfActiveEnemyBullets = 0;
+									} 
+									else {
+										enemyBullets[numberOfActiveEnemyBullets].posX = enemyShips[i].posX;
+										enemyBullets[numberOfActiveEnemyBullets].posY = enemyShips[i].posY + (enemyShips[i].height / 2);
+										enemyBullets[numberOfActiveEnemyBullets].Xvelocity = enemyBullets[numberOfActiveEnemyBullets].baseVelocity;
+										enemyBullets[numberOfActiveEnemyBullets].inStorage = false;
+										enemyShips[i].shootFrame += ((static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (4))) + 2);
+										enemyShips[i].frameCounter = 0;
+										numberOfActiveEnemyBullets++;
+									}
 							}
 							if ((enemyShips[i].frame == 4) and (enemyShips[i].frameUpdater == 1))
 							{
@@ -547,6 +689,10 @@ int main()
 				for (int i = 0; i < numberOfPlayerBullets; i++)
 				{
 					DrawTextureRec(playerBulletTexture, (Rectangle{ playerBullets[i].currentSprite, 0, playerBullets[i].width, playerBullets[i].height }), (Vector2{ playerBullets[i].posX,playerBullets[i].posY }), WHITE);
+				}
+				for (int i = 0; i < numberOfEnemyBullets; i++)
+				{
+					DrawTextureRec(enemyBulletTexture, (Rectangle{ enemyBullets[i].currentSprite, 0, enemyBullets[i].width, enemyBullets[i].height }), (Vector2{ enemyBullets[i].posX,enemyBullets[i].posY }), WHITE);
 				}
 				DrawTextureRec(sprite, (Rectangle{ player.currentSprite, 0, player.width, player.height }), (Vector2{ player.posX, player.posY }), WHITE);
 				DrawCircle(player.posX, player.posY, 1, PINK);
