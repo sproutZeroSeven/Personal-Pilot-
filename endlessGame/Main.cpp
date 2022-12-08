@@ -72,8 +72,8 @@ struct enemyShip {
 	bool homing = false;
 	
 	//shooting
-	int shootFrame;
-	int frameCounter;
+	int shootFrame = 0;
+	int frameCounter = 0;
 }enemyShipDefault;
 
 
@@ -101,6 +101,7 @@ int main()
 {
 	bool startGame = false;
 	int numberOfActivePlayerBullets = 0, numberOfActiveEnemyBullets = 0;
+	float deltaX, deltaY, newY, newX, difference;
 	//sets the window dimensions
 	InitWindow(window.width, window.height, window.title);
 	Texture2D sprite = LoadTexture("gameAssets/playerShips/rocketshipBlue(60x28).png");
@@ -336,25 +337,30 @@ int main()
 
 				for (int i = 0; i < numberOfEnemyHomingBullets; i++) {
 					if (enemyHomingBullets[i].isHoming) {
+						//
 						float baseVelocity = enemyHomingBullets[i].baseVelocity * dT;
-					
-						enemyHomingBullets[i].homingTheta;
+						//std::cout << "un-un-lmao";
 
-						float newTheta;
-						float globalDifference = 100000000;
-						for (int i = -5; i < 5; i++) {
-							float deltaX = baseVelocity * cos(enemyHomingBullets[i].homingTheta + i);
-							float deltaY = baseVelocity * sin(enemyHomingBullets[i].homingTheta + i);
+						float newTheta = enemyHomingBullets[i].homingTheta;
+						float globalDifference = 1000000000069;
+						for (int j = -10; j < 10; j++) {
+							
+							deltaX = baseVelocity * cos(enemyHomingBullets[i].homingTheta + (j));
+							deltaY = baseVelocity * sin(enemyHomingBullets[i].homingTheta + (j));
+							//std::cout << "un-lmao";
 
-							float difference = ((enemyHomingBullets[i].posX + deltaX) - player.posX) + ((enemyHomingBullets[i].posY + deltaY) - player.posY);
+							newX = enemyHomingBullets[i].posX + deltaX;
+							newY = enemyHomingBullets[i].posY + deltaY;
+							difference =  atan(((newY) - player.posY)  /  ((newX) - player.posX));
 							if (difference < globalDifference) {
 								globalDifference = difference;
-								newTheta = (enemyHomingBullets[i].homingTheta + i);
+								//std::cout << "lmao";
+								newTheta = (enemyHomingBullets[i].homingTheta + (j));
 							}
 						}
 						enemyHomingBullets[i].homingTheta = newTheta;
-						enemyHomingBullets[i].posX += baseVelocity * cos(enemyHomingBullets[i].homingTheta + i);
-						enemyHomingBullets[i].posY += baseVelocity * sin(enemyHomingBullets[i].homingTheta + i);
+						enemyHomingBullets[i].posX += baseVelocity * cos(enemyHomingBullets[i].homingTheta);
+						enemyHomingBullets[i].posY += baseVelocity * sin(enemyHomingBullets[i].homingTheta);
 					}
 				}
 
@@ -480,8 +486,6 @@ int main()
 							bugs[i].Xvelocity = 0;
 							bugs[i].frame = 0;
 							bugs[i].isDead = true;
-							bugs[i].isScored = true;
-
 						}
 						else {
 							for (int e = 0; e < numberOfPlayerBullets; e++) {
@@ -538,13 +542,11 @@ int main()
 					if (!bugs[i].isDead) {
 						if ((CheckCollisionRecs(enemyShipFrontWingRec, playerLengthRec) or CheckCollisionRecs(enemyShipFrontWingRec, playerBackWingRec) or CheckCollisionRecs(enemyShipFrontWingRec, playerFrontWingRec)) or (CheckCollisionRecs(enemyShipBackWingRec, playerLengthRec) or CheckCollisionRecs(enemyShipBackWingRec, playerBackWingRec) or CheckCollisionRecs(enemyShipBackWingRec, playerFrontWingRec)) or (CheckCollisionRecs(enemyShipLengthRec, playerLengthRec) or CheckCollisionRecs(enemyShipLengthRec, playerBackWingRec) or CheckCollisionRecs(enemyShipLengthRec, playerFrontWingRec))) {
 							player.hp -= 1;
-							bugs[i].currentSprite = 6 * bugs[i].width;
-							bugs[i].hp = 0;
-							bugs[i].Xvelocity = 0;
-							bugs[i].frame = 0;
-							bugs[i].isDead = true;
-							bugs[i].isScored = true;
-
+							enemyShips[i].currentSprite = 6 * bugs[i].width;
+							enemyShips[i].hp = 0;
+							enemyShips[i].Xvelocity = 0;
+							enemyShips[i].frame = 0;
+							enemyShips[i].isDead = true;
 						}
 						else {
 							for (int e = 0; e < numberOfPlayerBullets; e++) {
