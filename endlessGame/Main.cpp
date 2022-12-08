@@ -1,4 +1,5 @@
 #include "raylib.h"  
+#include <cmath>
 #include <time.h>  
 #include <iostream>
 #include "string"
@@ -82,15 +83,19 @@ struct bullets {
 	float height = 6;//manually determined the height
 
 	float Xvelocity = 0;
+	float Yvelocity = 0;
 	float baseVelocity = 350;
 
 	float posY = 700;
 	float posX = 700;
 	float currentSprite = 0;
+
+	float homingTheta = 0;
 	
 	//sent off screen
 	bool inStorage = true;
-} playerBullet, enemyBullet;
+	bool isHoming = false;
+} playerBullet, enemyBullet, enemyHomingMissle;
 
 int main()
 {
@@ -115,6 +120,8 @@ int main()
 	//player bullets texture
 	Texture2D playerBulletTexture = LoadTexture("gameAssets/projectiles/playerPellets(8x6).png");
 	Texture2D enemyBulletTexture = LoadTexture("gameAssets/projectiles/enemyPellet(12x12).png");
+	Texture2D enemyHomingBulletTexture = LoadTexture("gameAssets/projectiles/homingMissle(24x11).png");
+
 
 	//player hearts 
 	Texture2D playerHeart = LoadTexture("gameAssets/wrench(21x21).png");
@@ -183,6 +190,16 @@ int main()
 		enemyBullets[i].baseVelocity = 250;
 	}
 
+	const int numberOfEnemyHomingBullets = 1;
+	bullets enemyHomingBullets[numberOfEnemyHomingBullets];
+	for (int i = 0; i < numberOfEnemyHomingBullets; i++) {
+		enemyHomingBullets[i].height = 11;
+		enemyHomingBullets[i].width = 24;
+		enemyHomingBullets[i].baseVelocity = -100;
+		enemyHomingBullets[i].isHoming = true;
+		enemyHomingBullets[i].posX = window.width / 2;
+		enemyHomingBullets[i].posY = window.height / 2;
+	}
 
 	SetTargetFPS(60);
 	while (!(WindowShouldClose())) {//menu
@@ -315,6 +332,30 @@ int main()
 				for (int i = 0; i < numberOfEnemyBullets; i++)
 				{
 					enemyBullets[i].posX -= enemyBullets[i].Xvelocity * dT;
+				}
+
+				for (int i = 0; i < numberOfEnemyHomingBullets; i++) {
+					if (enemyHomingBullets[i].isHoming) {
+						float baseVelocity = enemyHomingBullets[i].baseVelocity * dT;
+					
+						enemyHomingBullets[i].homingTheta;
+
+						float newTheta;
+						float globalDifference = 100000000;
+						for (int i = -5; i < 5; i++) {
+							float deltaX = baseVelocity * cos(enemyHomingBullets[i].homingTheta + i);
+							float deltaY = baseVelocity * sin(enemyHomingBullets[i].homingTheta + i);
+
+							float difference = ((enemyHomingBullets[i].posX + deltaX) - player.posX) + ((enemyHomingBullets[i].posY + deltaY) - player.posY);
+							if (difference < globalDifference) {
+								globalDifference = difference;
+								newTheta = (enemyHomingBullets[i].homingTheta + i);
+							}
+						}
+						enemyHomingBullets[i].homingTheta = newTheta;
+						enemyHomingBullets[i].posX += baseVelocity * cos(enemyHomingBullets[i].homingTheta + i);
+						enemyHomingBullets[i].posY += baseVelocity * sin(enemyHomingBullets[i].homingTheta + i);
+					}
 				}
 
 				if (player.posY >= window.height - player.height)
@@ -691,6 +732,10 @@ int main()
 				{
 					DrawTextureRec(enemyBulletTexture, (Rectangle{ enemyBullets[i].currentSprite, 0, enemyBullets[i].width, enemyBullets[i].height }), (Vector2{ enemyBullets[i].posX,enemyBullets[i].posY }), WHITE);
 				}
+				for (int i = 0; i < numberOfEnemyHomingBullets; i++)
+				{
+					DrawTextureRec(enemyHomingBulletTexture, (Rectangle{ enemyHomingBullets[i].currentSprite, 0, enemyHomingBullets[i].width, enemyHomingBullets[i].height }), (Vector2{ enemyHomingBullets[i].posX,enemyHomingBullets[i].posY }), WHITE);
+				}
 				DrawTextureRec(sprite, (Rectangle{ player.currentSprite, 0, player.width, player.height }), (Vector2{ player.posX, player.posY }), WHITE);
 				DrawCircle(player.posX, player.posY, 1, PINK);
 
@@ -751,6 +796,7 @@ int main()
 	UnloadTexture(enemyShipSprite);
 	UnloadTexture(bg);
 	UnloadTexture(playerBulletTexture);
+	UnloadTexture(enemyBulletTexture);
 	UnloadTexture(playerHeart);
 	UnloadTexture(lossBg);
 	UnloadTexture(sMenuBg);
