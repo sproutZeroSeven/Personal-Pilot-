@@ -89,6 +89,10 @@ struct bullets {
 	float posY = 700;
 	float posX = 700;
 	float currentSprite = 0;
+	int frame = 2;
+	float updateTime = 1.0 / 4.0;
+	float runningTime = 0;
+	int frameUpdater = 1;
 
 	float homingTheta = 0;
 	
@@ -121,7 +125,7 @@ int main()
 	//player bullets texture
 	Texture2D playerBulletTexture = LoadTexture("gameAssets/projectiles/playerPellets(8x6).png");
 	Texture2D enemyBulletTexture = LoadTexture("gameAssets/projectiles/enemyPellet(12x12).png");
-	Texture2D enemyHomingBulletTexture = LoadTexture("gameAssets/projectiles/homingMissle(24x11).png");
+	Texture2D enemyHomingBulletTexture = LoadTexture("gameAssets/projectiles/homingMissle(25x11).png");
 
 
 	//player hearts 
@@ -195,10 +199,10 @@ int main()
 	bullets enemyHomingBullets[numberOfEnemyHomingBullets];
 	for (int i = 0; i < numberOfEnemyHomingBullets; i++) {
 		enemyHomingBullets[i].height = 11;
-		enemyHomingBullets[i].width = 24;
+		enemyHomingBullets[i].width = 25;
 		enemyHomingBullets[i].baseVelocity = -100;
 		enemyHomingBullets[i].isHoming = true;
-		enemyHomingBullets[i].posX = window.width / 2;
+		enemyHomingBullets[i].posX = window.width;
 		enemyHomingBullets[i].posY = window.height / 2;
 	}
 
@@ -335,32 +339,21 @@ int main()
 					enemyBullets[i].posX -= enemyBullets[i].Xvelocity * dT;
 				}
 
+				//homing bullet tracking
 				for (int i = 0; i < numberOfEnemyHomingBullets; i++) {
 					if (enemyHomingBullets[i].isHoming) {
-						//
-						float baseVelocity = enemyHomingBullets[i].baseVelocity * dT;
-						//std::cout << "un-un-lmao";
+						if (!enemyHomingBullets[i].inStorage) {
+							float baseVelocity = enemyHomingBullets[i].baseVelocity * dT;
 
-						float newTheta = enemyHomingBullets[i].homingTheta;
-						float globalDifference = 1000000000069;
-						for (int j = -10; j < 10; j++) {
-							
-							deltaX = baseVelocity * cos(enemyHomingBullets[i].homingTheta + (j));
-							deltaY = baseVelocity * sin(enemyHomingBullets[i].homingTheta + (j));
-							//std::cout << "un-lmao";
-
-							newX = enemyHomingBullets[i].posX + deltaX;
-							newY = enemyHomingBullets[i].posY + deltaY;
-							difference =  atan(((newY) - player.posY)  /  ((newX) - player.posX));
-							if (difference < globalDifference) {
-								globalDifference = difference;
-								//std::cout << "lmao";
-								newTheta = (enemyHomingBullets[i].homingTheta + (j));
+							if (enemyHomingBullets[i].posX > player.posX) {
+								enemyHomingBullets[i].homingTheta = atan((enemyHomingBullets[i].posY - player.posY) / (enemyHomingBullets[i].posX - player.posX));
 							}
+							else if (enemyHomingBullets[i].posX < player.posX) {
+								enemyHomingBullets[i].homingTheta = atan(-1 * (player.posY - enemyHomingBullets[i].posY) / (player.posX - enemyHomingBullets[i].posX));
+							}
+							enemyHomingBullets[i].posX += baseVelocity * cos(enemyHomingBullets[i].homingTheta);
+							enemyHomingBullets[i].posY += baseVelocity * sin(enemyHomingBullets[i].homingTheta);
 						}
-						enemyHomingBullets[i].homingTheta = newTheta;
-						enemyHomingBullets[i].posX += baseVelocity * cos(enemyHomingBullets[i].homingTheta);
-						enemyHomingBullets[i].posY += baseVelocity * sin(enemyHomingBullets[i].homingTheta);
 					}
 				}
 
