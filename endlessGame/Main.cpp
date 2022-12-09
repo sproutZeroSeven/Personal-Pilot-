@@ -120,7 +120,7 @@ int main()
 
 
 	//backround texture
-	Texture2D bg = LoadTexture("gameAssets/spaceBG.png");
+	Texture2D bg = LoadTexture("gameAssets/spaceBG(1500x380).png");
 	float BGposX = 0;
 	//player bullets texture
 	Texture2D playerBulletTexture = LoadTexture("gameAssets/projectiles/playerPellets(8x6).png");
@@ -690,7 +690,7 @@ int main()
 
 
 				BGposX -= 40 * dT;
-				if (BGposX <= -(676))
+				if (BGposX <= -(1500))
 				{
 					BGposX = 0;
 				}
