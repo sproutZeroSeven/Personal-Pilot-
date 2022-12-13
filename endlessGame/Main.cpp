@@ -204,6 +204,7 @@ int main()
 		enemyHomingBullets[i].isHoming = true;
 		enemyHomingBullets[i].posX = window.width;
 		enemyHomingBullets[i].posY = window.height / 2;
+		enemyHomingBullets[i].inStorage = false;
 	}
 
 	SetTargetFPS(60);
