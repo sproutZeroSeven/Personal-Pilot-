@@ -359,6 +359,11 @@ int main()
 					enemyShips[i].posX += enemyShips[i].Xvelocity *dT;
 				}
 
+				//moves enemy Homing ships
+				for (int i = 0; i < numberOfEnemyHomingShips; i++) {
+					enemyHomingShips[i].posX += enemyHomingShips[i].Xvelocity * dT;
+				}
+
 				//moves bullets
 				for (int i = 0; i < numberOfPlayerBullets; i++)
 				{
@@ -618,6 +623,61 @@ int main()
 					}
 				}
 
+				for (int i = 0; i < numberOfEnemyHomingShips; i++) {
+					if (!enemyHomingShips[i].isDead) {
+						//enemyShip box colliders
+						Rectangle enemyShipFrontWingRec{	///
+							enemyShips[i].posX + 32,
+							enemyShips[i].posY + 6,
+							4,
+							enemyShips[i].height - 6
+						};									////values need to be changed
+						Rectangle enemyShipBackWingRec{			///
+							enemyShips[i].posX + 14,
+							enemyShips[i].posY + 1,
+							9,
+							18
+						};
+						Rectangle enemyShipLengthRec{	///
+							enemyShips[i].posX,
+							enemyShips[i].posY + 9,
+							enemyShips[i].width,
+							10
+						};
+
+
+
+						if ((CheckCollisionRecs(enemyShipFrontWingRec, playerLengthRec) or CheckCollisionRecs(enemyShipFrontWingRec, playerBackWingRec) or CheckCollisionRecs(enemyShipFrontWingRec, playerFrontWingRec)) or (CheckCollisionRecs(enemyShipBackWingRec, playerLengthRec) or CheckCollisionRecs(enemyShipBackWingRec, playerBackWingRec) or CheckCollisionRecs(enemyShipBackWingRec, playerFrontWingRec)) or (CheckCollisionRecs(enemyShipLengthRec, playerLengthRec) or CheckCollisionRecs(enemyShipLengthRec, playerBackWingRec) or CheckCollisionRecs(enemyShipLengthRec, playerFrontWingRec))) {
+							player.hp -= 1;
+							//enemyShips[i].currentSprite = 6 * bugs[i].enemyShips;
+							enemyShips[i].hp = 0;
+							enemyShips[i].Xvelocity = 0;
+							enemyShips[i].frame = 0;
+							enemyShips[i].isDead = true;
+						}
+						else {
+							for (int e = 0; e < numberOfPlayerBullets; e++) {
+								Rectangle playerBulletRec{
+									playerBullets[e].posX,
+									playerBullets[e].posY,
+									playerBullets[e].width,
+									playerBullets[e].height
+								};
+								if ((CheckCollisionRecs(playerBulletRec, enemyShipLengthRec)) or (CheckCollisionRecs(playerBulletRec, enemyShipBackWingRec)) or (CheckCollisionRecs(playerBulletRec, enemyShipFrontWingRec))) {
+									playerBullets[e].inStorage = true;
+									playerBullets[e].posX = 700;
+									playerBullets[e].posY = 700;
+									playerBullets[e].Xvelocity = 0;
+									enemyShips[i].isDead = true;
+									//enemyShips[i].currentSprite = 6 * bugs[i].width;       //update for death animation
+									enemyShips[i].Xvelocity = 0;
+									enemyShips[i].frame = 0;
+								}
+
+							}
+						}
+					}
+				}
 				for (int i = 0; i < numberOfEnemyBullets; i++) {
 					if (!enemyBullets[i].inStorage) {
 						Rectangle enemyBulletRec{
