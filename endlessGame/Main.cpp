@@ -75,7 +75,7 @@ struct enemyShip {
 	//shooting
 	int shootFrame = 0;
 	int frameCounter = 0;
-}enemyShipDefault;
+}enemyShipDefault, enemyHomingShip;
 
 
 struct bullets {
@@ -110,16 +110,17 @@ int main()
 	//sets the window dimensions
 	InitWindow(window.width, window.height, window.title);
 	Texture2D sprite = LoadTexture("gameAssets/playerShips/rocketshipBlue(60x28).png");
-	//enemy texture
 
+
+	//enemy texture
 	Texture2D defaultEnemySpritePink = LoadTexture("gameAssets/enemies/defaultEnemy/defaultEnemyPink(33x35).png");	
 	Texture2D defaultEnemySpriteYellow = LoadTexture("gameAssets/enemies/defaultEnemy/defaultEnemyYellow(33x35).png");
 	Texture2D defaultEnemySpriteBlue = LoadTexture("gameAssets/enemies/defaultEnemy/defaultEnemyBlue(33x35).png");
 	Texture2D defaultEnemySpriteGreen = LoadTexture("gameAssets/enemies/defaultEnemy/defaultEnemyGreen(33x35).png");
 
-	Texture2D enemyShipSprite = LoadTexture("gameAssets/enemies/enemySpaceShip/enemySpaceship(63x24).png");
+	Texture2D enemyShipSprite = LoadTexture("gameAssets/enemies/enemySpaceShips/enemySpaceship(63x24).png");
 
-
+	Texture2D enemyHomingShipSprite = LoadTexture("gameAssets/enemies/enemySpaceShips/EnemyHomingShip(60x33).png");
 	//backround texture
 	Texture2D bg = LoadTexture("gameAssets/spaceBG(1500x380).png");
 	float BGposX = 0;
@@ -170,9 +171,23 @@ int main()
 		enemyShips[i].Xvelocity = -(static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 50)) - 25;
 		enemyShips[i].posX = (300 * i) + window.width;
 		enemyShips[i].shootFrame =((static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (4))) + 4);
+	}
 
 
+	const int numberOfEnemyHomingShips = 12;
+	enemyShip enemyHomingShips[numberOfEnemyHomingShips];
+	for (int i = 0; i < numberOfEnemyHomingShips; i++) {
+		//set to template
+		enemyHomingShips[i].width = 60;
+		enemyHomingShips[i].height = 33;
 
+		enemyHomingShips[i].frame = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (5)));
+		enemyHomingShips[i].currentSprite = 0;
+		enemyHomingShips[i].updateTime = 1.0 / ((static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (2))) + 5);
+		enemyHomingShips[i].posY = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (window.height - bugs[1].width - 10)));
+		enemyHomingShips[i].Xvelocity = -(static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 50)) - 25;
+		enemyHomingShips[i].posX = (300 * i) + window.width;
+		enemyHomingShips[i].shootFrame = ((static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (8))) + 8);
 	}
 
 	const int numberOfPlayerBullets = 24;
@@ -301,6 +316,18 @@ int main()
 						enemyShips[i].isDead = false;
 						enemyShips[i].shootFrame += ((static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (6))) + 4);
 						enemyShips[i].isScored = false;
+
+					}
+				}
+				//catches enemyHomingShips at the start of the window and sends them off screen with no velocity as dead
+				for (int i = 0; i < numberOfEnemyHomingShips; i++) {
+					if (!(enemyHomingShips[i].isDead) and (enemyHomingShips[i].posX <= -140)) {
+						enemyHomingShips[i].Xvelocity = -(static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 50)) - 50;
+						enemyHomingShips[i].posX = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX / ((1000 / (score + 1) + 1) * window.width))) + window.width;
+						enemyHomingShips[i].posY = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (window.height - enemyHomingShips[1].width - 10)));
+						enemyHomingShips[i].isDead = false;
+						enemyHomingShips[i].shootFrame += ((static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (6))) + 4);
+						enemyHomingShips[i].isScored = false;
 
 					}
 				}
@@ -506,7 +533,6 @@ int main()
 										bugs[i].frame = 0;
 									}
 								}
-
 							}
 						}
 					}
@@ -657,7 +683,7 @@ int main()
 							}
 							bugs[i].frame++;
 						}
-						else if (bugs[i].currentSprite == (6 * bugs[i].width)) {
+						else if (bugs[i].isDead){
 							bugs[i].Xvelocity = 0;
 							bugs[i].currentSprite = (bugs[i].frame * bugs[i].width) + (6 * 33);
 							bugs[i].frame++;
@@ -672,9 +698,7 @@ int main()
 							}
 							else if ((bugs[i].frame == 0) and (bugs[i].frameUpdater == -1)) {
 								bugs[i].frameUpdater = 1;
-
 							}
-						
 						}
 					}
 				}
@@ -711,7 +735,6 @@ int main()
 						}
 					}
 				}
-
 
 
 				BGposX -= 40 * dT;
