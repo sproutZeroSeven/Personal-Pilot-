@@ -179,7 +179,7 @@ int main()
 	for (int i = 0; i < numberOfEnemyHomingShips; i++) {
 		//set to template
 		enemyHomingShips[i].width = 60;
-		enemyHomingShips[i].height = 33;
+		enemyHomingShips[i].height = 29;
 
 		enemyHomingShips[i].frame = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (5)));
 		enemyHomingShips[i].currentSprite = 0;
@@ -626,34 +626,41 @@ int main()
 				for (int i = 0; i < numberOfEnemyHomingShips; i++) {
 					if (!enemyHomingShips[i].isDead) {
 						//enemyShip box colliders
-						Rectangle enemyShipFrontWingRec{	///
+						Rectangle enemyHomingShipWingRec{	///
+							enemyShips[i].posX + 36,
+							enemyShips[i].posY + 10,
+							9,
+							18
+						};									////values need to be changed
+						DrawRectangle(
 							enemyShips[i].posX + 32,
 							enemyShips[i].posY + 6,
 							4,
-							enemyShips[i].height - 6
-						};									////values need to be changed
-						Rectangle enemyShipBackWingRec{			///
-							enemyShips[i].posX + 14,
-							enemyShips[i].posY + 1,
-							9,
-							18
+							enemyShips[i].height - 6,
+							GREEN
+						);
+						Rectangle homingShipMainHeightRec{			///
+							enemyShips[i].posX + 22,
+							enemyShips[i].posY,
+							16,
+							21
 						};
-						Rectangle enemyShipLengthRec{	///
-							enemyShips[i].posX,
-							enemyShips[i].posY + 9,
-							enemyShips[i].width,
+						Rectangle HomingShipLengthRec{	///
+							enemyShips[i].posX+1,
+							enemyShips[i].posY + 11,
+							46,
 							10
 						};
 
 
 
-						if ((CheckCollisionRecs(enemyShipFrontWingRec, playerLengthRec) or CheckCollisionRecs(enemyShipFrontWingRec, playerBackWingRec) or CheckCollisionRecs(enemyShipFrontWingRec, playerFrontWingRec)) or (CheckCollisionRecs(enemyShipBackWingRec, playerLengthRec) or CheckCollisionRecs(enemyShipBackWingRec, playerBackWingRec) or CheckCollisionRecs(enemyShipBackWingRec, playerFrontWingRec)) or (CheckCollisionRecs(enemyShipLengthRec, playerLengthRec) or CheckCollisionRecs(enemyShipLengthRec, playerBackWingRec) or CheckCollisionRecs(enemyShipLengthRec, playerFrontWingRec))) {
+						if ((CheckCollisionRecs(enemyHomingShipWingRec, playerLengthRec) or CheckCollisionRecs(enemyHomingShipWingRec, playerBackWingRec) or CheckCollisionRecs(enemyHomingShipWingRec, playerFrontWingRec)) or (CheckCollisionRecs(homingShipMainHeightRec, playerLengthRec) or CheckCollisionRecs(homingShipMainHeightRec, playerBackWingRec) or CheckCollisionRecs(homingShipMainHeightRec, playerFrontWingRec)) or (CheckCollisionRecs(HomingShipLengthRec, playerLengthRec) or CheckCollisionRecs(HomingShipLengthRec, playerBackWingRec) or CheckCollisionRecs(HomingShipLengthRec, playerFrontWingRec))) {
 							player.hp -= 1;
 							//enemyShips[i].currentSprite = 6 * bugs[i].enemyShips;
-							enemyShips[i].hp = 0;
-							enemyShips[i].Xvelocity = 0;
-							enemyShips[i].frame = 0;
-							enemyShips[i].isDead = true;
+							enemyHomingShips[i].hp = 0;
+							enemyHomingShips[i].Xvelocity = 0;
+							enemyHomingShips[i].frame = 0;
+							enemyHomingShips[i].isDead = true;
 						}
 						else {
 							for (int e = 0; e < numberOfPlayerBullets; e++) {
@@ -663,15 +670,15 @@ int main()
 									playerBullets[e].width,
 									playerBullets[e].height
 								};
-								if ((CheckCollisionRecs(playerBulletRec, enemyShipLengthRec)) or (CheckCollisionRecs(playerBulletRec, enemyShipBackWingRec)) or (CheckCollisionRecs(playerBulletRec, enemyShipFrontWingRec))) {
+								if ((CheckCollisionRecs(playerBulletRec, HomingShipLengthRec)) or (CheckCollisionRecs(playerBulletRec, homingShipMainHeightRec)) or (CheckCollisionRecs(playerBulletRec, enemyHomingShipWingRec))) {
 									playerBullets[e].inStorage = true;
 									playerBullets[e].posX = 700;
 									playerBullets[e].posY = 700;
 									playerBullets[e].Xvelocity = 0;
 									enemyShips[i].isDead = true;
 									//enemyShips[i].currentSprite = 6 * bugs[i].width;       //update for death animation
-									enemyShips[i].Xvelocity = 0;
-									enemyShips[i].frame = 0;
+									enemyHomingShips[i].Xvelocity = 0;
+									enemyHomingShips[i].frame = 0;
 								}
 
 							}
@@ -824,6 +831,11 @@ int main()
 				}
 				for (int i = 0; i < numberOFEnemyShips; i++) {
 					DrawTextureRec(enemyShipSprite, (Rectangle{ enemyShips[i].currentSprite, 0, enemyShips[i].width, enemyShips[i].height }), (Vector2{ enemyShips[i].posX,enemyShips[i].posY }), WHITE);
+
+				}
+
+				for (int i = 0; i < numberOfEnemyHomingBullets; i++) {
+					DrawTextureRec(enemyHomingShipSprite, (Rectangle{ enemyHomingShips[i].currentSprite, 0, enemyHomingShips[i].width, enemyHomingShips[i].height }), (Vector2{ enemyHomingShips[i].posX,enemyHomingShips[i].posY }), WHITE);
 
 				}
 
