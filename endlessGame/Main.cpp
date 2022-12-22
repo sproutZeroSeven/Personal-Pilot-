@@ -105,7 +105,7 @@ struct bullets {
 int main()
 {
 	bool startGame = false;
-	int numberOfActivePlayerBullets = 0, numberOfActiveEnemyBullets = 0;
+	int numberOfActivePlayerBullets = 0, numberOfActiveEnemyBullets = 0, numberOfActiveEnemyHomingBullets = 0;
 	float deltaX, deltaY, newY, newX, difference;
 	//sets the window dimensions
 	InitWindow(window.width, window.height, window.title);
@@ -221,7 +221,6 @@ int main()
 		enemyHomingBullets[i].isHoming = true;
 		enemyHomingBullets[i].posX = window.width;
 		enemyHomingBullets[i].posY = window.height / 2;
-		enemyHomingBullets[i].inStorage = false;
 	}
 
 	SetTargetFPS(60);
@@ -657,7 +656,6 @@ int main()
 						if ((CheckCollisionRecs(enemyHomingShipWingRec, playerLengthRec) or CheckCollisionRecs(enemyHomingShipWingRec, playerBackWingRec) or CheckCollisionRecs(enemyHomingShipWingRec, playerFrontWingRec)) or (CheckCollisionRecs(homingShipMainHeightRec, playerLengthRec) or CheckCollisionRecs(homingShipMainHeightRec, playerBackWingRec) or CheckCollisionRecs(homingShipMainHeightRec, playerFrontWingRec)) or (CheckCollisionRecs(HomingShipLengthRec, playerLengthRec) or CheckCollisionRecs(HomingShipLengthRec, playerBackWingRec) or CheckCollisionRecs(HomingShipLengthRec, playerFrontWingRec))) {
 							player.hp -= 1;
 							//enemyShips[i].currentSprite = 6 * bugs[i].enemyShips;
-							enemyHomingShips[i].hp = 0;
 							enemyHomingShips[i].Xvelocity = 0;
 							enemyHomingShips[i].frame = 0;
 							enemyHomingShips[i].isDead = true;
@@ -675,10 +673,9 @@ int main()
 									playerBullets[e].posX = 700;
 									playerBullets[e].posY = 700;
 									playerBullets[e].Xvelocity = 0;
-									enemyShips[i].isDead = true;
-									//enemyShips[i].currentSprite = 6 * bugs[i].width;       //update for death animation
 									enemyHomingShips[i].Xvelocity = 0;
 									enemyHomingShips[i].frame = 0;
+									enemyHomingShips[i].isDead = true;
 								}
 
 							}
@@ -803,6 +800,41 @@ int main()
 					}
 				}
 
+				//enemy homing ship animations + shooting
+				for (int i = 0; i < numberOfEnemyHomingShips; i++) {
+					if (enemyHomingShips[i].runningTime > enemyHomingShips[i].updateTime) {
+						enemyHomingShips[i].runningTime = 0;
+						if (!enemyHomingShips[i].isDead) {			////////////////////////
+							//updates the sprite
+							enemyHomingShips[i].currentSprite = enemyHomingShips[i].frame * enemyHomingShips[i].width;
+							enemyHomingShips[i].frame += enemyHomingShips[i].frameUpdater;
+							enemyHomingShips[i].frameCounter++;
+							if ((enemyHomingShips[i].posX < (window.width + 10)) and (enemyHomingShips[i].frameCounter % enemyHomingShips[i].shootFrame) == 0) {
+								if (numberOfActiveEnemyHomingBullets == numberOfEnemyHomingBullets) {
+									numberOfActiveEnemyHomingBullets = 0;
+								}
+								else {
+									enemyHomingBullets[numberOfActiveEnemyHomingBullets].posX = enemyHomingShips[i].posX;
+									enemyHomingBullets[numberOfActiveEnemyHomingBullets].posY = enemyHomingShips[i].posY + (enemyHomingShips[i].height / 2);
+									enemyHomingBullets[numberOfActiveEnemyHomingBullets].Xvelocity = enemyHomingBullets[numberOfActiveEnemyHomingBullets].baseVelocity;
+									enemyHomingBullets[numberOfActiveEnemyHomingBullets].inStorage = false;
+									enemyHomingShips[i].frameCounter = 0;
+									numberOfActiveEnemyHomingBullets++;
+								}
+							}
+							if ((enemyHomingShips[i].frame == 4) and (enemyHomingShips[i].frameUpdater == 1))
+							{
+								enemyHomingShips[i].frameUpdater = -1;
+							}
+							else if ((enemyHomingShips[i].frame == 0) and (enemyHomingShips[i].frameUpdater == -1)) {
+								enemyHomingShips[i].frameUpdater = 1;
+							}
+						}
+					}
+				}
+
+
+
 
 				BGposX -= 40 * dT;
 				if (BGposX <= -(1500))
@@ -851,6 +883,7 @@ int main()
 				{
 					DrawTextureRec(enemyHomingBulletTexture, (Rectangle{ enemyHomingBullets[i].currentSprite, 0, enemyHomingBullets[i].width, enemyHomingBullets[i].height }), (Vector2{ enemyHomingBullets[i].posX,enemyHomingBullets[i].posY }), WHITE);
 				}
+
 				DrawTextureRec(sprite, (Rectangle{ player.currentSprite, 0, player.width, player.height }), (Vector2{ player.posX, player.posY }), WHITE);
 				DrawCircle(player.posX, player.posY, 1, PINK);
 
