@@ -180,7 +180,7 @@ int main()
 		//set to template
 		enemyHomingShips[i].width = 60;
 		enemyHomingShips[i].height = 29;
-
+		enemyHomingShips[i].isDead = true;
 		enemyHomingShips[i].frame = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (5)));
 		enemyHomingShips[i].currentSprite = 0;
 		enemyHomingShips[i].updateTime = 1.0 / ((static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (2))) + 5);
@@ -212,7 +212,7 @@ int main()
 		enemyBullets[i].baseVelocity = 250;
 	}
 
-	const int numberOfEnemyHomingBullets = 1;
+	const int numberOfEnemyHomingBullets = 12;
 	bullets enemyHomingBullets[numberOfEnemyHomingBullets];
 	for (int i = 0; i < numberOfEnemyHomingBullets; i++) {
 		enemyHomingBullets[i].height = 11;
@@ -320,7 +320,7 @@ int main()
 				}
 				//catches enemyHomingShips at the start of the window and sends them off screen with no velocity as dead
 				for (int i = 0; i < numberOfEnemyHomingShips; i++) {
-					if (!(enemyHomingShips[i].isDead) and (enemyHomingShips[i].posX <= -140)) {
+					if ((!enemyHomingShips[i].isDead) and (enemyHomingShips[i].posX <= -140)) {
 						enemyHomingShips[i].Xvelocity = -(static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 50)) - 50;
 						enemyHomingShips[i].posX = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX / ((1000 / (score + 1) + 1) * window.width))) + window.width;
 						enemyHomingShips[i].posY = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (window.height - enemyHomingShips[1].width - 10)));
@@ -812,7 +812,6 @@ int main()
 							if ((enemyHomingShips[i].posX < (window.width + 10)) and (enemyHomingShips[i].frameCounter % enemyHomingShips[i].shootFrame) == 0) {
 								if (numberOfActiveEnemyHomingBullets == numberOfEnemyHomingBullets) {
 									numberOfActiveEnemyHomingBullets = 0;
-									//test
 								}
 								else {
 									enemyHomingBullets[numberOfActiveEnemyHomingBullets].posX = enemyHomingShips[i].posX;
@@ -867,7 +866,7 @@ int main()
 
 				}
 
-				for (int i = 0; i < numberOfEnemyHomingBullets; i++) {
+				for (int i = 0; i < numberOfEnemyHomingShips; i++) {
 					DrawTextureRec(enemyHomingShipSprite, (Rectangle{ enemyHomingShips[i].currentSprite, 0, enemyHomingShips[i].width, enemyHomingShips[i].height }), (Vector2{ enemyHomingShips[i].posX,enemyHomingShips[i].posY }), WHITE);
 
 				}
@@ -884,6 +883,8 @@ int main()
 				{
 					DrawTextureRec(enemyHomingBulletTexture, (Rectangle{ enemyHomingBullets[i].currentSprite, 0, enemyHomingBullets[i].width, enemyHomingBullets[i].height }), (Vector2{ enemyHomingBullets[i].posX,enemyHomingBullets[i].posY }), WHITE);
 				}
+
+
 
 				DrawTextureRec(sprite, (Rectangle{ player.currentSprite, 0, player.width, player.height }), (Vector2{ player.posX, player.posY }), WHITE);
 				DrawCircle(player.posX, player.posY, 1, PINK);
@@ -915,6 +916,7 @@ int main()
 						DrawText("100", (enemyShips[i].posX - 10), (enemyShips[i].posY - 5), 17, YELLOW);
 					}
 				}
+
 
 
 				for (int i = 0; i < player.hp; i++) {
