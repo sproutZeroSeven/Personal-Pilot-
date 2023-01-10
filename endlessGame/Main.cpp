@@ -812,6 +812,7 @@ int main()
 							if ((enemyHomingShips[i].posX < (window.width + 10)) and (enemyHomingShips[i].frameCounter % enemyHomingShips[i].shootFrame) == 0) {
 								if (numberOfActiveEnemyHomingBullets == numberOfEnemyHomingBullets) {
 									numberOfActiveEnemyHomingBullets = 0;
+									//test
 								}
 								else {
 									enemyHomingBullets[numberOfActiveEnemyHomingBullets].posX = enemyHomingShips[i].posX;
