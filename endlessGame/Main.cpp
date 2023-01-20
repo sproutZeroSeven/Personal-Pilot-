@@ -7,8 +7,8 @@
 //structs
 struct Window 
 {
-	int width = 512;
-	int height = 380;
+	int width = 1280;
+	int height = 720;
 	const char* title = "Personal Pilot!";
 }window;
 
@@ -129,7 +129,7 @@ int main()
 
 	Texture2D enemyHomingShipSprite = LoadTexture("gameAssets/enemies/enemySpaceShips/EnemyHomingShip(60x33).png");
 	//backround texture
-	Texture2D bg = LoadTexture("gameAssets/spaceBG(1500x380).png");
+	Texture2D bg = LoadTexture("gameAssets/spaceBG(2843x720).png");
 
 	//player bullets texture
 	Texture2D playerBulletTexture = LoadTexture("gameAssets/projectiles/playerPellets(8x6).png");
@@ -1036,7 +1036,7 @@ int main()
 					}
 
 					BGposX -= 40 * dT;
-					if (BGposX <= -(1500))
+					if (BGposX <= -(2843))
 					{
 						BGposX = 0;
 					}
