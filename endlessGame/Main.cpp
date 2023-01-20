@@ -258,7 +258,7 @@ int main()
 			}
 
 
-			const int numberOfEnemyHomingShips = 12;
+			const int numberOfEnemyHomingShips = 14;
 			enemyShip enemyHomingShips[numberOfEnemyHomingShips];
 			for (int i = 0; i < numberOfEnemyHomingShips; i++)
 			{
@@ -592,11 +592,11 @@ int main()
 										playerBullets[e].posX = 700;
 										playerBullets[e].posY = 700;
 										playerBullets[e].Xvelocity = 0;
-										if (!bugs[i].hp == 1) {
+										if (bugs[i].hp > 1) {
 											bugs[i].hp -= 1;
 										}
 
-										if (bugs[i].hp == 0)
+										if (bugs[i].hp == 1)
 										{
 											bugs[i].isDead = true;
 											bugs[i].currentSprite = 6 * bugs[i].width;
