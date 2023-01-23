@@ -109,11 +109,61 @@ struct bullets
 	bool isHoming = false;
 } playerBullet, enemyBullet, enemyHomingMissle;
 
+struct points {
+	float width = 10;
+	float height = 10;
+
+	float posY = window.height + 700;
+	float posX = window.width + 700;
+
+	int frame = 2;
+	float runningTime = 0;
+
+}explosions;
+
+struct bossMotherShip {
+
+
+	//set dimensions
+	float width = 199;//updated to match width of single sprite
+	float height = 57;//manually determined the height
+	int hp = 250;
+
+	float Yvelocity = 0;
+	float Xvelocity = 0;
+	float baseVelocity = 15;
+	float posY = window.height - 30;
+	float posX = window.width - 15 - 57;
+
+	//animation data
+
+	int frame = 0;
+	int startFrame = 2;
+	int maxFrame = 5;
+	float currentSprite = 0;
+	float updateTime = 1.0 / 8.0;
+	float runningTime = 0;
+	int frameUpdater = 1;
+	//is dead 
+	bool isDead = false;
+	bool isCompletedDeath = false;
+
+	//has gotten a point from the enemy
+	bool isScored = false;
+	bool homing = false;
+
+	//attacking
+	int nextAttack;
+	int shootFrame = 0;
+	int frameCounter = 0;
+}motherShip;
+
 int main()
 {
 	bool startGame = false, mainMenu = true;
-	int numberOfActivePlayerBullets = 0, numberOfActiveEnemyBullets = 0, numberOfActiveEnemyHomingBullets = 0;
+	int numberOfActivePlayerBullets = 0, numberOfActiveEnemyBullets = 0, numberOfActiveEnemyHomingBullets = 0, numberOfActiveExplosions = 0;
 	float difference, BGposX = 0;
+
 	//sets the window dimensions
 	InitWindow(window.width, window.height, window.title);
 	Texture2D sprite = LoadTexture("gameAssets/playerShips/rocketshipBlue(60x28).png");
@@ -129,13 +179,13 @@ int main()
 
 	Texture2D enemyHomingShipSprite = LoadTexture("gameAssets/enemies/enemySpaceShips/EnemyHomingShip(60x33).png");
 	//backround texture
-	Texture2D bg = LoadTexture("gameAssets/spaceBG(2843x720).png");
+	Texture2D bg = LoadTexture("gameAssets/spaceBG(1500x380).png");
 
 	//player bullets texture
 	Texture2D playerBulletTexture = LoadTexture("gameAssets/projectiles/playerPellets(8x6).png");
 	Texture2D enemyBulletTexture = LoadTexture("gameAssets/projectiles/enemyPellet(12x12).png");
 	Texture2D enemyHomingBulletTexture = LoadTexture("gameAssets/projectiles/homingMissle(25x11).png");
-
+	Texture2D explosion = LoadTexture("gameAssets/projectiles/Explosion(10x10).png");
 
 	//player hearts 
 	Texture2D playerHeart = LoadTexture("gameAssets/wrench(21x21).png");
@@ -210,7 +260,7 @@ int main()
 			BeginDrawing();
 			ClearBackground(WHITE);
 			//DrawTextureEx(sMenuBg, {startMenuFrame,0 }, 0, 145/100, WHITE);
-			//doesnt work as a bg so i drew it as a sprite
+			//doesn't work as a bg so i drew it as a sprite
 
 			//DrawTexturePro(sMenuBg, (Rectangle{ startMenuFrame, 0, 512, 380 }), (Rectangle((startMenuFrame * (window.height / 380)), 0, 512 * (window.height / 380), 380 * (window.height / 380))), (Vector2{ 0, 0 }), 0, WHITE);
 			DrawTextureRec(sMenuBg, (Rectangle{ startMenuFrame, 0, 512, 380 }), (Vector2{ 0, 0 }), WHITE);
@@ -222,10 +272,11 @@ int main()
 		}
 		else if (startGame)
 		{	
-			ToggleFullscreen();       ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			ToggleFullscreen();       
 
 			score = 0;
 			player.hp = 3;
+			int distanceTravelled = 0;
 			const int numberOfBugs = 12;
 			character bugs[numberOfBugs];
 			srand(time(0));
@@ -311,11 +362,20 @@ int main()
 				enemyHomingBullets[i].posX = window.width + 200;
 				enemyHomingBullets[i].posY = window.height + 200;
 			}
+
+			const int numberOfExplosions = 24;
+			points explosions[numberOfExplosions];
+			for (int i = 0; i < numberOfExplosions; i++)
+			{
+				explosions[i].posX = window.width + 200;
+				explosions[i].posY = window.height + 200;
+			}
 			while (!(WindowShouldClose()))//game
 			{
 				//when dead
 				
-				if (!player.isDead or !player.hp <= 0) {
+				if (!player.isDead or !player.hp <= 0) 
+				{
 					const float dT = GetFrameTime();
 
 					//begin drawin
@@ -365,7 +425,6 @@ int main()
 							enemyShips[i].isDead = false;
 							enemyShips[i].shootFrame += ((static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (6))) + 4);
 							enemyShips[i].isScored = false;
-
 						}
 					}
 					//catches enemyHomingShips at the start of the window and sends them off screen with no velocity as dead
@@ -396,7 +455,6 @@ int main()
 							bugs[i].frame = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (5)));
 							bugs[i].currentSprite = 0;
 							bugs[i].isScored = false;
-
 						}
 					}
 
@@ -1048,7 +1106,8 @@ int main()
 					}
 
 					BGposX -= 40 * dT;
-					if (BGposX <= -(2843))
+					distanceTravelled += 40 * dT;
+					if (BGposX <= -(1500))
 					{
 						BGposX = 0;
 					}
