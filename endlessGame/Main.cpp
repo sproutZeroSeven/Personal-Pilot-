@@ -7,8 +7,8 @@
 //structs
 struct Window 
 {
-	int width = 1280;
-	int height = 720;
+	int width = 512;
+	int height = 380;
 	const char* title = "Personal Pilot!";
 }window;
 
@@ -94,8 +94,8 @@ struct bullets
 	float Yvelocity = 0;
 	float baseVelocity = 350;
 
-	float posY = 700;
-	float posX = 700;
+	float posY = window.height + 700;
+	float posX = window.width + 700;
 	float currentSprite = 0;
 	int frame = 2;
 	float updateTime = 1.0 / 4.0;
@@ -148,7 +148,7 @@ int main()
 
 	Texture2D dMenuOptions = LoadTexture("gameAssets/menus/deathScreen/options(189x127).png");
 
-	float startMenuFrame = 0, sMenuOptionSelected = 0, startMenuRunningTime = 0, dMenuOptionSelected = 0;
+	float  startMenuFrame = 0, sMenuOptionSelected = 0, startMenuRunningTime = 0, dMenuOptionSelected = 0;
 	int startMenuFrameChange = window.width, sMenuOptionWidth = 189, dMenuOptionWidth = 189, score = 0;
 
 	SetTargetFPS(60);
@@ -211,7 +211,9 @@ int main()
 			ClearBackground(WHITE);
 			//DrawTextureEx(sMenuBg, {startMenuFrame,0 }, 0, 145/100, WHITE);
 			//doesnt work as a bg so i drew it as a sprite
-			DrawTextureRec(sMenuBg, (Rectangle{ startMenuFrame, 0, 676, 380 }), (Vector2{ 0, 0 }), WHITE);
+
+			//DrawTexturePro(sMenuBg, (Rectangle{ startMenuFrame, 0, 512, 380 }), (Rectangle((startMenuFrame * (window.height / 380)), 0, 512 * (window.height / 380), 380 * (window.height / 380))), (Vector2{ 0, 0 }), 0, WHITE);
+			DrawTextureRec(sMenuBg, (Rectangle{ startMenuFrame, 0, 512, 380 }), (Vector2{ 0, 0 }), WHITE);
 			DrawTextureRec(sMenuOptions, (Rectangle{ sMenuOptionSelected, 0, 189, 127 }), (Vector2{ 290, 240 }), WHITE);
 			DrawText("By Kylar McLean & Carter Newman", (5), (360), 17, SKYBLUE);
 
@@ -306,8 +308,8 @@ int main()
 
 				enemyHomingShips[i].updateTime = 1.0 / ((static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (6))) + 6);
 
-				enemyHomingBullets[i].posX = window.width;
-				enemyHomingBullets[i].posY = window.height / 2;
+				enemyHomingBullets[i].posX = window.width + 200;
+				enemyHomingBullets[i].posY = window.height + 200;
 			}
 			while (!(WindowShouldClose()))//game
 			{
@@ -326,8 +328,8 @@ int main()
 						if (!(playerBullets[i].inStorage) and (playerBullets[i].posX >= (window.width + 30)))
 						{
 							playerBullets[i].Xvelocity = 0;
-							playerBullets[i].posX = 700;
-							playerBullets[i].posY = 700;
+							playerBullets[i].posX = window.width + 700;
+							playerBullets[i].posY = window.height + 700;
 						}
 					}
 
@@ -337,9 +339,19 @@ int main()
 						if (!(enemyBullets[i].inStorage) and (enemyBullets[i].posX <= -40))
 						{
 							enemyBullets[i].Xvelocity = 0;
-							enemyBullets[i].posX = 700;
-							enemyBullets[i].posY = 700;
+							enemyBullets[i].posX = window.width + 700;
+							enemyBullets[i].posY = window.height + 700;
 							enemyBullets[i].inStorage = true;
+						}
+					}
+					for (int i = 0; i < numberOfEnemyHomingBullets; i++)
+					{
+						if (!(enemyHomingBullets[i].inStorage) and (enemyHomingBullets[i].posX <= -40))
+						{
+							enemyHomingBullets[i].Xvelocity = 0;
+							enemyHomingBullets[i].posX = window.width + 700;
+							enemyHomingBullets[i].posY = window.height + 700;
+							enemyHomingBullets[i].inStorage = true;
 						}
 					}
 					//catches enemyships at the start of the window and sends them off screen with no velocity as dead
@@ -591,8 +603,8 @@ int main()
 									if ((CheckCollisionRecs(playerBulletRec, bugBodyrec) or (CheckCollisionRecs(playerBulletRec, bugAntennaRec))))
 									{
 										playerBullets[e].inStorage = true;
-										playerBullets[e].posX = 700;
-										playerBullets[e].posY = 700;
+										playerBullets[e].posX = window.width + 200;
+										playerBullets[e].posY = window.height + 700;
 										playerBullets[e].Xvelocity = 0;
 										if (bugs[i].hp > 1) {
 											bugs[i].hp -= 1;
@@ -634,8 +646,8 @@ int main()
 								player.hp -= 1;
 								enemyHomingBullets[i].inStorage = true;
 								enemyHomingBullets[i].isHoming = false;
-								enemyHomingBullets[i].posX = 700;
-								enemyHomingBullets[i].posY = 700;
+								enemyHomingBullets[i].posX = window.width + 700;
+								enemyHomingBullets[i].posY = window.height + 700;
 							}
 						}
 					}
@@ -689,8 +701,8 @@ int main()
 									if ((CheckCollisionRecs(playerBulletRec, enemyShipLengthRec)) or (CheckCollisionRecs(playerBulletRec, enemyShipBackWingRec)) or (CheckCollisionRecs(playerBulletRec, enemyShipFrontWingRec)))
 									{
 										playerBullets[e].inStorage = true;
-										playerBullets[e].posX = 700;
-										playerBullets[e].posY = 700;
+										playerBullets[e].posX = window.width + 700;
+										playerBullets[e].posY = window.height +700;
 										playerBullets[e].Xvelocity = 0;
 										enemyShips[i].isDead = true;
 
@@ -764,8 +776,8 @@ int main()
 									if ((CheckCollisionRecs(playerBulletRec, HomingShipLengthRec)) or (CheckCollisionRecs(playerBulletRec, homingShipMainHeightRec)) or (CheckCollisionRecs(playerBulletRec, enemyHomingShipWingRec)))
 									{
 										playerBullets[e].inStorage = true;
-										playerBullets[e].posX = 700;
-										playerBullets[e].posY = 700;
+										playerBullets[e].posX = window.width + 700;
+										playerBullets[e].posY = window.height + 700;
 										playerBullets[e].Xvelocity = 0;
 										enemyHomingShips[i].Xvelocity = 0;
 										enemyHomingShips[i].frame = 0;
@@ -791,8 +803,8 @@ int main()
 							if ((CheckCollisionRecs(enemyBulletRec, playerFrontWingRec)) or (CheckCollisionRecs(enemyBulletRec, playerBackWingRec)) or (CheckCollisionRecs(enemyBulletRec, playerLengthRec)))
 							{
 								enemyBullets[i].inStorage = true;
-								enemyBullets[i].posX = 700;
-								enemyBullets[i].posY = 700;
+								enemyBullets[i].posX = window.width + 700;
+								enemyBullets[i].posY = window.height + 700;
 								enemyBullets[i].Xvelocity = 0;
 								player.hp -= 1;
 							}
@@ -848,8 +860,8 @@ int main()
 							bugs[i].runningTime = 0;
 							if (bugs[i].isDead) {
 								if (bugs[i].currentSprite >= 9 * (enemyShips[i].width)) {
-									bugs[i].posX = 600;
-									bugs[i].posX = 700;
+									bugs[i].posX = window.width + 250;
+									bugs[i].posY = window.height + 250;
 									bugs[i].isCompletedDeath = true;
 								}
 								else if (bugs[i].currentSprite < 5 * (bugs[i].width)) {
