@@ -116,9 +116,11 @@ struct points {
 	float posY = window.height + 700;
 	float posX = window.width + 700;
 
-	int frame = 2;
+	int frame = 0;
 	float runningTime = 0;
+	float updateTime = 1.0 / 8.0;
 
+	bool isActive = false;
 }explosions;
 
 struct bossMotherShip {
@@ -160,8 +162,8 @@ struct bossMotherShip {
 
 int main()
 {
-	bool startGame = false, mainMenu = true;
-	int numberOfActivePlayerBullets = 0, numberOfActiveEnemyBullets = 0, numberOfActiveEnemyHomingBullets = 0, numberOfActiveExplosions = 0;
+	bool startGame = false, mainMenu = true, bossActive = false;
+	int numberOfActivePlayerBullets = 0, numberOfActiveEnemyBullets = 0, numberOfActiveEnemyHomingBullets = 0, numberOfActiveExplosions = 0, bossBattleActivationTime, bossBattleActivationRunTime = 0, bossWarning;
 	float difference, BGposX = 0;
 
 	//sets the window dimensions
@@ -178,6 +180,10 @@ int main()
 	Texture2D enemyShipSprite = LoadTexture("gameAssets/enemies/enemySpaceShips/enemySpaceship(63x24).png");
 
 	Texture2D enemyHomingShipSprite = LoadTexture("gameAssets/enemies/enemySpaceShips/EnemyHomingShip(60x33).png");
+
+	Texture2D motherShipBody = LoadTexture("gameAssets/bosses/motherShipBase(199x57).png");
+	Texture2D motherShipBeam = LoadTexture("gameAssets/bosses/motherShipBeam(200x289).png");
+
 	//backround texture
 	Texture2D bg = LoadTexture("gameAssets/spaceBG(1500x380).png");
 
@@ -186,6 +192,7 @@ int main()
 	Texture2D enemyBulletTexture = LoadTexture("gameAssets/projectiles/enemyPellet(12x12).png");
 	Texture2D enemyHomingBulletTexture = LoadTexture("gameAssets/projectiles/homingMissle(25x11).png");
 	Texture2D explosion = LoadTexture("gameAssets/projectiles/Explosion(10x10).png");
+
 
 	//player hearts 
 	Texture2D playerHeart = LoadTexture("gameAssets/wrench(21x21).png");
@@ -297,6 +304,9 @@ int main()
 			const int numberOFEnemyShips = 12;
 			enemyShip enemyShips[numberOFEnemyShips];
 
+			bossBattleActivationTime = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (15)))+15;
+			bossWarning = bossBattleActivationTime + 3;
+
 			for (int i = 0; i < numberOFEnemyShips; i++)
 			{
 				//set to template
@@ -365,11 +375,7 @@ int main()
 
 			const int numberOfExplosions = 24;
 			points explosions[numberOfExplosions];
-			for (int i = 0; i < numberOfExplosions; i++)
-			{
-				explosions[i].posX = window.width + 200;
-				explosions[i].posY = window.height + 200;
-			}
+
 			while (!(WindowShouldClose()))//game
 			{
 				//when dead
@@ -377,6 +383,12 @@ int main()
 				if (!player.isDead or !player.hp <= 0) 
 				{
 					const float dT = GetFrameTime();
+
+					bossBattleActivationRunTime += dT;
+						
+					if (bossBattleActivationTime <= bossBattleActivationRunTime) {
+						bossActive = true;
+					}
 
 					//begin drawin
 					BeginDrawing();
@@ -660,6 +672,14 @@ int main()
 									};
 									if ((CheckCollisionRecs(playerBulletRec, bugBodyrec) or (CheckCollisionRecs(playerBulletRec, bugAntennaRec))))
 									{
+										explosions[numberOfActiveExplosions].posX = playerBullets[e].posX;
+										explosions[numberOfActiveExplosions].posY = playerBullets[e].posY;
+										explosions[numberOfActiveExplosions].isActive = true;
+										numberOfActiveExplosions++;
+										if (numberOfActiveExplosions == numberOfExplosions) {
+											numberOfActiveExplosions = 0;
+										}
+
 										playerBullets[e].inStorage = true;
 										playerBullets[e].posX = window.width + 200;
 										playerBullets[e].posY = window.height + 700;
@@ -758,6 +778,14 @@ int main()
 									};
 									if ((CheckCollisionRecs(playerBulletRec, enemyShipLengthRec)) or (CheckCollisionRecs(playerBulletRec, enemyShipBackWingRec)) or (CheckCollisionRecs(playerBulletRec, enemyShipFrontWingRec)))
 									{
+										explosions[numberOfActiveExplosions].posY = playerBullets[e].posY;
+										explosions[numberOfActiveExplosions].isActive = true;
+										explosions[numberOfActiveExplosions].posX = playerBullets[e].posX;
+										numberOfActiveExplosions++;
+										if (numberOfActiveExplosions == numberOfExplosions) {
+											numberOfActiveExplosions = 0;
+										}
+
 										playerBullets[e].inStorage = true;
 										playerBullets[e].posX = window.width + 700;
 										playerBullets[e].posY = window.height +700;
@@ -833,6 +861,14 @@ int main()
 									};
 									if ((CheckCollisionRecs(playerBulletRec, HomingShipLengthRec)) or (CheckCollisionRecs(playerBulletRec, homingShipMainHeightRec)) or (CheckCollisionRecs(playerBulletRec, enemyHomingShipWingRec)))
 									{
+										explosions[numberOfActiveExplosions].posX = playerBullets[e].posX;
+										explosions[numberOfActiveExplosions].posY = playerBullets[e].posY;
+										explosions[numberOfActiveExplosions].isActive = true;
+										numberOfActiveExplosions++;
+										if (numberOfActiveExplosions == numberOfExplosions) {
+											numberOfActiveExplosions = 0;
+										}
+
 										playerBullets[e].inStorage = true;
 										playerBullets[e].posX = window.width + 700;
 										playerBullets[e].posY = window.height + 700;
@@ -860,6 +896,11 @@ int main()
 
 							if ((CheckCollisionRecs(enemyBulletRec, playerFrontWingRec)) or (CheckCollisionRecs(enemyBulletRec, playerBackWingRec)) or (CheckCollisionRecs(enemyBulletRec, playerLengthRec)))
 							{
+								explosions[numberOfActiveExplosions].posX = enemyBullets[i].posX;
+								explosions[numberOfActiveExplosions].posY = enemyBullets[i].posY;
+								explosions[numberOfActiveExplosions].isActive = true;
+								numberOfActiveExplosions++;
+
 								enemyBullets[i].inStorage = true;
 								enemyBullets[i].posX = window.width + 700;
 								enemyBullets[i].posY = window.height + 700;
@@ -874,8 +915,11 @@ int main()
 
 					player.posY -= player.Yvelocity * dT;
 					player.posX -= player.Xvelocity * dT;
-
-
+					for (int i = 0; i < numberOfExplosions; i++) {
+						if (explosions[i].isActive) {
+							explosions[i].runningTime += dT;
+						}
+					}
 					player.runningTime += dT;
 					for (int i = 0; i < numberOfBugs; i++)
 					{
@@ -1163,7 +1207,22 @@ int main()
 					{
 						DrawTextureRec(enemyHomingBulletTexture, (Rectangle{ enemyHomingBullets[i].currentSprite, 0, enemyHomingBullets[i].width, enemyHomingBullets[i].height }), (Vector2{ enemyHomingBullets[i].posX,enemyHomingBullets[i].posY }), WHITE);
 					}
+					for (int i = 0; i < numberOfEnemyHomingBullets; i++)
+					{
+						if (explosions[i].isActive) {
+							DrawTextureRec(explosion, (Rectangle{ explosions[i].frame*explosions[i].width, 0, explosions[i].width, explosions[i].height }), (Vector2{ explosions[i].posX,explosions[i].posY }), WHITE);
+							
+							if (explosions[i].runningTime >= explosions[i].updateTime) {
+								explosions[i].frame+= 1;
+							}
 
+							if (explosions[i].frame >= 15) {
+								explosions[i].frame = 0;
+								explosions[i].isActive = false;
+
+							}
+						}
+					}
 					DrawTextureRec(sprite, (Rectangle{ player.currentSprite, 0, player.width, player.height }), (Vector2{ player.posX, player.posY }), WHITE);
 					DrawCircle(player.posX, player.posY, 1, PINK);
 
@@ -1222,6 +1281,10 @@ int main()
 
 					char textScore[6] = "score";
 					DrawText(TextFormat("Score: %08i", score), 300, 5, 26, RED);
+
+					if (bossActive and (bossWarning >= bossBattleActivationRunTime)) {
+						DrawText("The Mothership Draws Closer...", window.width / 2, window.height / 2, 50, RED);
+					}
 
 					EndDrawing();
 
