@@ -279,10 +279,10 @@ int main()
 		}
 		else if (startGame)
 		{	
-			ToggleFullscreen();       
+			//ToggleFullscreen();       
 
 			score = 0;
-			player.hp = 3;
+			player.hp = 12;
 			int distanceTravelled = 0;
 			const int numberOfBugs = 12;
 			character bugs[numberOfBugs];
@@ -304,7 +304,7 @@ int main()
 			const int numberOFEnemyShips = 12;
 			enemyShip enemyShips[numberOFEnemyShips];
 
-			bossBattleActivationTime = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (15)))+15;
+			bossBattleActivationTime = 1/(static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (3)))+5;
 			bossWarning = bossBattleActivationTime + 3;
 
 			for (int i = 0; i < numberOFEnemyShips; i++)
@@ -367,7 +367,7 @@ int main()
 				enemyHomingBullets[i].baseVelocity = -100;
 				enemyHomingBullets[i].isHoming = true;
 
-				enemyHomingShips[i].updateTime = 1.0 / ((static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (6))) + 6);
+				enemyHomingBullets[i].updateTime = 1.0 / ((static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (6))) + 6);
 
 				enemyHomingBullets[i].posX = window.width + 200;
 				enemyHomingBullets[i].posY = window.height + 200;
@@ -386,7 +386,7 @@ int main()
 
 					bossBattleActivationRunTime += dT;
 						
-					if (bossBattleActivationTime <= bossBattleActivationRunTime) {
+					if (bossBattleActivationTime < bossBattleActivationRunTime) {
 						bossActive = true;
 					}
 
@@ -402,6 +402,7 @@ int main()
 							playerBullets[i].Xvelocity = 0;
 							playerBullets[i].posX = window.width + 700;
 							playerBullets[i].posY = window.height + 700;
+							playerBullets[i].updateTime = 1.0 / 6.0;
 						}
 					}
 
@@ -437,6 +438,7 @@ int main()
 							enemyShips[i].isDead = false;
 							enemyShips[i].shootFrame += ((static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (6))) + 4);
 							enemyShips[i].isScored = false;
+							enemyShips[i].updateTime = 1.0 / ((static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (2))) + 5);
 						}
 					}
 					//catches enemyHomingShips at the start of the window and sends them off screen with no velocity as dead
@@ -450,6 +452,7 @@ int main()
 							enemyHomingShips[i].isDead = false;
 							enemyHomingShips[i].shootFrame += ((static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (6))) + 4);
 							enemyHomingShips[i].isScored = false;
+							enemyHomingShips[i].updateTime = 1.0 / ((static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (2))) + 5);
 
 						}
 					}
@@ -915,6 +918,7 @@ int main()
 
 					player.posY -= player.Yvelocity * dT;
 					player.posX -= player.Xvelocity * dT;
+
 					for (int i = 0; i < numberOfExplosions; i++) {
 						if (explosions[i].isActive) {
 							explosions[i].runningTime += dT;
@@ -944,9 +948,8 @@ int main()
 						player.currentSprite = player.frame * player.width;
 						player.frame += player.frameUpdater;
 						//reset frame and set sprite to middle animation to loop
-						if (player.frame > 2 and (player.frameUpdater == 1))
+						if (player.frame > 1 and (player.frameUpdater == 1))
 						{
-							player.currentSprite = 0 * player.width;
 							player.frameUpdater = -1;
 						}
 						else if ((player.frame == 0) and (player.frameUpdater == -1)) {
@@ -961,7 +964,7 @@ int main()
 						{
 							bugs[i].runningTime = 0;
 							if (bugs[i].isDead) {
-								if (bugs[i].currentSprite >= 9 * (enemyShips[i].width)) {
+								if (bugs[i].currentSprite >= 9 * (bugs[i].width)) {
 									bugs[i].posX = window.width + 250;
 									bugs[i].posY = window.height + 250;
 									bugs[i].isCompletedDeath = true;
@@ -999,13 +1002,13 @@ int main()
 							enemyShips[i].runningTime = 0;							
 							if (enemyShips[i].isDead) {
 								if (enemyShips[i].currentSprite >=  21 * (enemyShips[i].width)) {
-									enemyShips[i].posX = 600;
-									enemyShips[i].posX = 700;
+									enemyShips[i].posX = window.width + 600;
+									enemyShips[i].posY = window.height + 700;
 									enemyShips[i].isCompletedDeath = true;
 								}
 								else if (enemyShips[i].currentSprite < 5 * (enemyShips[i].width)) {
 									enemyShips[i].currentSprite = 5 * (enemyShips[i].width);
-
+									enemyShips[i].updateTime = 1.0 / ((static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (10))) + 10);
 								}
 								else {
 									enemyShips[i].currentSprite += (enemyShips[i].width);
@@ -1053,12 +1056,13 @@ int main()
 							enemyHomingShips[i].runningTime = 0;
 							if (enemyHomingShips[i].isDead) {
 								if (enemyHomingShips[i].currentSprite >= 18 * (enemyHomingShips[i].width)) {
-									enemyHomingShips[i].posX = 600;
-									enemyHomingShips[i].posX = 700;
+									enemyHomingShips[i].posX = window.width + 600;
+									enemyHomingShips[i].posY = window.height + 700;
 									enemyHomingShips[i].isCompletedDeath = true;
 								}
 								else if (enemyHomingShips[i].currentSprite < 5 * (enemyHomingShips[i].width)) {
 									enemyHomingShips[i].currentSprite = 5 * (enemyHomingShips[i].width);
+									enemyHomingShips[i].updateTime = 1.0 / ((static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (10))) + 10);
 
 								}
 								else {
@@ -1110,27 +1114,6 @@ int main()
 						if (enemyHomingBullets[i].runningTime > enemyHomingBullets[i].updateTime)
 						{
 							enemyHomingBullets[i].runningTime = 0;
-							//if (enemyHomingBullets[i].currentSprite >= (6 * enemyHomingBullets[i].width) and enemyHomingBullets[i].frame > 0)
-							//{
-
-							//	enemyHomingBullets[i].currentSprite = (enemyHomingBullets[i].frame * enemyHomingBullets[i].width) + (6 * 33);
-							//	if (bugs[i].frame > 3)
-							//	{
-							//		bugs[i].posX = 600;
-							//		bugs[i].posY = 600;
-							//		bugs[i].isCompletedDeath = true;
-							//	}
-							//	bugs[i].frame++;
-							//}
-							
-							//else if (bugs[i].isDead)
-							//{
-							//	bugs[i].Xvelocity = 0;
-							//	bugs[i].currentSprite = (bugs[i].frame * bugs[i].width) + (6 * 33);
-							//	bugs[i].frame++;
-							//}
-							//above is for a death if i wanna add an exposion on impact i need to add else and change variables
-
 							if (!enemyHomingBullets[i].inStorage)
 							{
 								//updates the sprite
@@ -1294,9 +1277,7 @@ int main()
 						break;
 					}
 				}
-				//while game
 			}
-			//DrawTextureEx(lossBg, { 0,0 }, 0, (145 / 100), WHITE);
 		}
 		else
 		{	
