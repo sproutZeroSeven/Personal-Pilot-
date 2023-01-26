@@ -282,7 +282,7 @@ int main()
 			//ToggleFullscreen();       
 
 			score = 0;
-			player.hp = 12;
+			player.hp = 1;
 			player.posY = GetRenderHeight() / 2;
 			int distanceTravelled = 0;
 			const int numberOfBugs = 12;
@@ -1142,10 +1142,11 @@ int main()
 					{
 						BGposX = 0;
 					}
-
+					float windowWidth = GetRenderWidth(), windowHeight = GetRenderHeight();
 					//draw background first
-					DrawTextureEx(bg, { BGposX,0 }, 0, 145 / 100, WHITE);
-					DrawTextureEx(bg, { (BGposX + (bg.width * (145 / 100))),0 }, 0, (145 / 100), WHITE);
+					//DrawTextureEx(bg, { BGposX,0 }, 0, 145 / 100, WHITE);
+					//DrawTextureEx(bg, { (BGposX + (bg.width * (145 / 100))),0 }, 0, (145 / 100), WHITE);
+					DrawTexturePro(bg, (Rectangle{ BGposX, 0, 512 + (windowWidth/16), 380 + (windowHeight/9) }), (Rectangle{ BGposX, 0, windowWidth, windowHeight }), (Vector2{ 0,0 }), 0, WHITE);
 
 					for (int i = 0; i < numberOfBugs; i++)
 					{
