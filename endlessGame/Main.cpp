@@ -7,8 +7,8 @@
 //structs
 struct Window 
 {
-	int width = 512;
-	int height = 380;
+	int width = GetScreenWidth();
+	int height =  GetScreenHeight();
 	const char* title = "Personal Pilot!";
 }window;
 
@@ -27,8 +27,8 @@ struct character
 	float Xvelocity = 0;
 	float baseVelocity = 300;
 	
-	float posY = window.height - height;
-	float posX = window.height / 2 - width / 2;
+	float posY = 0;
+	float posX = 0;
 	
 	//animation data
 	
@@ -94,8 +94,8 @@ struct bullets
 	float Yvelocity = 0;
 	float baseVelocity = 350;
 
-	float posY = window.height + 700;
-	float posX = window.width + 700;
+	float posY = GetRenderHeight() + 700;
+	float posX = GetRenderWidth() + 700;
 	float currentSprite = 0;
 	int frame = 2;
 	float updateTime = 1.0 / 4.0;
@@ -113,8 +113,8 @@ struct points {
 	float width = 10;
 	float height = 10;
 
-	float posY = window.height + 700;
-	float posX = window.width + 700;
+	float posY = GetRenderHeight() + 700;
+	float posX = GetRenderWidth() + 700;
 
 	int frame = 0;
 	float runningTime = 0;
@@ -134,8 +134,8 @@ struct bossMotherShip {
 	float Yvelocity = 0;
 	float Xvelocity = 0;
 	float baseVelocity = 15;
-	float posY = window.height - 30;
-	float posX = window.width - 15 - 57;
+	float posY = GetRenderHeight() - 30;
+	float posX = GetRenderWidth() - 15 - 57;
 
 	//animation data
 
@@ -206,7 +206,7 @@ int main()
 	Texture2D dMenuOptions = LoadTexture("gameAssets/menus/deathScreen/options(189x127).png");
 
 	float  startMenuFrame = 0, sMenuOptionSelected = 0, startMenuRunningTime = 0, dMenuOptionSelected = 0;
-	int startMenuFrameChange = window.width, sMenuOptionWidth = 189, dMenuOptionWidth = 189, score = 0;
+	int startMenuFrameChange = GetRenderWidth(), sMenuOptionWidth = 189, dMenuOptionWidth = 189, score = 0;
 
 	SetTargetFPS(60);
 	while (!(WindowShouldClose())) 
@@ -222,12 +222,12 @@ int main()
 				//updates the sprite
 				startMenuFrame += startMenuFrameChange;
 				//reset frame and set sprite to middle animation to loop
-				if (startMenuFrame >= window.width * 3)
+				if (startMenuFrame >= GetRenderWidth() * 3)
 				{
-					startMenuFrameChange = -window.width;
+					startMenuFrameChange = -GetRenderWidth();
 				}
 				else if (startMenuFrame <= 0) {
-					startMenuFrameChange = window.width;
+					startMenuFrameChange = GetRenderWidth();
 				}
 			}
 
@@ -283,6 +283,7 @@ int main()
 
 			score = 0;
 			player.hp = 12;
+			player.posY = GetRenderHeight() / 2;
 			int distanceTravelled = 0;
 			const int numberOfBugs = 12;
 			character bugs[numberOfBugs];
@@ -296,18 +297,18 @@ int main()
 				bugs[i].frame = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (4)));
 				bugs[i].currentSprite = 0;
 				bugs[i].updateTime = 1.0 / ((static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (5))) + 8);
-				bugs[i].posY = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (window.height - bugs[1].width - 10)));
+				bugs[i].posY = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (GetRenderHeight() - bugs[1].width - 10)));
 				bugs[i].Xvelocity = -(static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 50)) - 50;
 				bugs[i].hp = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (4))) + 1;
-				bugs[i].posX += 300 * i + window.width;
+				bugs[i].posX += 300 * i + GetRenderWidth();
 			}
-			const int numberOFEnemyShips = 12;
-			enemyShip enemyShips[numberOFEnemyShips];
+			const int numberOfEnemyShips = 12;
+			enemyShip enemyShips[numberOfEnemyShips];
 
 			bossBattleActivationTime = 1/(static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (3)))+5;
 			bossWarning = bossBattleActivationTime + 3;
 
-			for (int i = 0; i < numberOFEnemyShips; i++)
+			for (int i = 0; i < numberOfEnemyShips; i++)
 			{
 				//set to template
 				enemyShips[i].width = 63;
@@ -316,9 +317,9 @@ int main()
 				enemyShips[i].frame = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (4)));
 				enemyShips[i].currentSprite = 0;
 				enemyShips[i].updateTime = 1.0 / ((static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (2))) + 5);
-				enemyShips[i].posY = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (window.height - bugs[1].width - 10)));
+				enemyShips[i].posY = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (GetRenderHeight() - bugs[1].width - 10)));
 				enemyShips[i].Xvelocity = -(static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 50)) - 25;
-				enemyShips[i].posX = (300 * i) + window.width;
+				enemyShips[i].posX = (300 * i) + GetRenderWidth();
 				enemyShips[i].shootFrame = ((static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (8))) + 12);
 			}
 
@@ -334,9 +335,9 @@ int main()
 				enemyHomingShips[i].frame = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (4)));
 				enemyHomingShips[i].currentSprite = 0;
 				enemyHomingShips[i].updateTime = 1.0 / ((static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (2))) + 5);
-				enemyHomingShips[i].posY = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (window.height - bugs[1].width - 10)));
+				enemyHomingShips[i].posY = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (GetRenderHeight() - bugs[1].width - 10)));
 				enemyHomingShips[i].Xvelocity = -(static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 50)) - 25;
-				enemyHomingShips[i].posX = (300 * i) + window.width;
+				enemyHomingShips[i].posX = (300 * i) + GetRenderWidth();
 				enemyHomingShips[i].shootFrame = ((static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (16))) + 16);
 			}
 
@@ -369,8 +370,8 @@ int main()
 
 				enemyHomingBullets[i].updateTime = 1.0 / ((static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (6))) + 6);
 
-				enemyHomingBullets[i].posX = window.width + 200;
-				enemyHomingBullets[i].posY = window.height + 200;
+				enemyHomingBullets[i].posX = GetRenderWidth() + 200;
+				enemyHomingBullets[i].posY = GetRenderHeight() + 200;
 			}
 
 			const int numberOfExplosions = 24;
@@ -397,11 +398,11 @@ int main()
 					//catching bullet at end of window
 					for (int i = 0; i < numberOfPlayerBullets; i++)
 					{
-						if (!(playerBullets[i].inStorage) and (playerBullets[i].posX >= (window.width + 30)))
+						if (!(playerBullets[i].inStorage) and (playerBullets[i].posX >= (GetRenderWidth() + 30)))
 						{
 							playerBullets[i].Xvelocity = 0;
-							playerBullets[i].posX = window.width + 700;
-							playerBullets[i].posY = window.height + 700;
+							playerBullets[i].posX = GetRenderWidth() + 700;
+							playerBullets[i].posY = GetRenderHeight() + 700;
 							playerBullets[i].updateTime = 1.0 / 6.0;
 						}
 					}
@@ -412,8 +413,8 @@ int main()
 						if (!(enemyBullets[i].inStorage) and (enemyBullets[i].posX <= -40))
 						{
 							enemyBullets[i].Xvelocity = 0;
-							enemyBullets[i].posX = window.width + 700;
-							enemyBullets[i].posY = window.height + 700;
+							enemyBullets[i].posX = GetRenderWidth() + 700;
+							enemyBullets[i].posY = GetRenderHeight() + 700;
 							enemyBullets[i].inStorage = true;
 						}
 					}
@@ -422,21 +423,22 @@ int main()
 						if (!(enemyHomingBullets[i].inStorage) and (enemyHomingBullets[i].posX <= -40))
 						{
 							enemyHomingBullets[i].Xvelocity = 0;
-							enemyHomingBullets[i].posX = window.width + 700;
-							enemyHomingBullets[i].posY = window.height + 700;
+							enemyHomingBullets[i].posX = GetRenderWidth() + 700;
+							enemyHomingBullets[i].posY = GetRenderHeight() + 700;
 							enemyHomingBullets[i].inStorage = true;
 						}
 					}
 					//catches enemyships at the start of the window and sends them off screen with no velocity as dead
-					for (int i = 0; i < numberOFEnemyShips; i++)
+					for (int i = 0; i < numberOfEnemyShips; i++)
 					{
 						if ((enemyShips[i].isCompletedDeath) or (enemyShips[i].posX <= -140))
 						{
 							enemyShips[i].Xvelocity = -(static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 50)) - 50;
-							enemyShips[i].posX = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX / ((1000 / (score + 1) + 1) * window.width))) + window.width;
-							enemyShips[i].posY = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (window.height - enemyShips[1].width - 10)));
+							enemyShips[i].posX = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX / ((1000 / (score + 1) + 1)))) * 2 * GetRenderWidth() + GetRenderWidth();
+							enemyShips[i].posY = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (GetRenderHeight() - enemyShips[1].width - 10)));
 							enemyShips[i].isDead = false;
-							enemyShips[i].shootFrame += ((static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (6))) + 4);
+							enemyShips[i].isCompletedDeath = false;
+							enemyShips[i].shootFrame = ((static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (8))) + 12);
 							enemyShips[i].isScored = false;
 							enemyShips[i].updateTime = 1.0 / ((static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (2))) + 5);
 						}
@@ -447,10 +449,11 @@ int main()
 						if ((enemyHomingShips[i].isCompletedDeath) or (enemyHomingShips[i].posX <= -140))
 						{
 							enemyHomingShips[i].Xvelocity = -(static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 50)) - 50;
-							enemyHomingShips[i].posX = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX / ((1000 / (score + 1) + 1) * window.width))) + window.width;
-							enemyHomingShips[i].posY = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (window.height - enemyHomingShips[1].width - 10)));
+							enemyHomingShips[i].posX = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX / ((1000 / (score + 1) + 1))))*2 * GetRenderWidth() + GetRenderWidth();
+							enemyHomingShips[i].posY = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (GetRenderHeight() - enemyHomingShips[1].width - 10)));
 							enemyHomingShips[i].isDead = false;
-							enemyHomingShips[i].shootFrame += ((static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (6))) + 4);
+							enemyHomingShips[i].isCompletedDeath = false;
+							enemyHomingShips[i].shootFrame = ((static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (16))) + 16);
 							enemyHomingShips[i].isScored = false;
 							enemyHomingShips[i].updateTime = 1.0 / ((static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (2))) + 5);
 
@@ -462,8 +465,8 @@ int main()
 						if ((bugs[i].isCompletedDeath) or (bugs[i].posX <= -40))
 						{
 							bugs[i].Xvelocity = -(static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 50)) - 50;
-							bugs[i].posX = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX / ((1000 / (score + 1) + 1) * window.width))) + window.width;
-							bugs[i].posY = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (window.height - bugs[1].width - 10)));
+							bugs[i].posX = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX / ((1000 / (score + 1) + 1))))* GetRenderWidth() + GetRenderWidth();
+							bugs[i].posY = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (GetRenderHeight() - bugs[1].width - 10)));
 							bugs[i].isDead = false;
 							bugs[i].isCompletedDeath = false;
 							bugs[i].hp = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (4))) + 1;
@@ -482,7 +485,7 @@ int main()
 						}
 					}
 					//moves enemy ships
-					for (int i = 0; i < numberOFEnemyShips; i++)
+					for (int i = 0; i < numberOfEnemyShips; i++)
 					{
 						enemyShips[i].posX += enemyShips[i].Xvelocity * dT;
 					}
@@ -528,11 +531,11 @@ int main()
 						}
 					}
 
-					if (player.posY >= window.height - player.height)
+					if (player.posY >= GetRenderHeight() - player.height)
 					{
 						//rectangle is on the ground
 						player.Yvelocity = 0;
-						player.posY = window.height - player.height;
+						player.posY = GetRenderHeight() - player.height;
 					}
 
 					//grounded and pressed space
@@ -548,7 +551,7 @@ int main()
 						}
 					}
 
-					if ((IsKeyDown(KEY_S) or IsKeyDown(KEY_DOWN)) && player.posY <= window.height)
+					if ((IsKeyDown(KEY_S) or IsKeyDown(KEY_DOWN)) && player.posY <= GetRenderHeight())
 					{
 						player.Yvelocity = -player.baseVelocity;
 					}
@@ -571,7 +574,7 @@ int main()
 							player.Xvelocity = player.Xvelocity / 2;
 						}
 					}
-					if ((IsKeyDown(KEY_D) or IsKeyDown(KEY_RIGHT)) && player.posX <= window.width - player.width)
+					if ((IsKeyDown(KEY_D) or IsKeyDown(KEY_RIGHT)) && player.posX <= GetRenderWidth() - player.width)
 					{
 						player.Xvelocity = -player.baseVelocity;
 					}
@@ -684,8 +687,8 @@ int main()
 										}
 
 										playerBullets[e].inStorage = true;
-										playerBullets[e].posX = window.width + 200;
-										playerBullets[e].posY = window.height + 700;
+										playerBullets[e].posX = GetRenderWidth() + 200;
+										playerBullets[e].posY = GetRenderHeight() + 700;
 										playerBullets[e].Xvelocity = 0;
 										if (bugs[i].hp > 1) {
 											bugs[i].hp -= 1;
@@ -727,13 +730,13 @@ int main()
 								player.hp -= 1;
 								enemyHomingBullets[i].inStorage = true;
 								enemyHomingBullets[i].isHoming = false;
-								enemyHomingBullets[i].posX = window.width + 700;
-								enemyHomingBullets[i].posY = window.height + 700;
+								enemyHomingBullets[i].posX = GetRenderWidth() + 700;
+								enemyHomingBullets[i].posY = GetRenderHeight() + 700;
 							}
 						}
 					}
 
-					for (int i = 0; i < numberOFEnemyShips; i++)
+					for (int i = 0; i < numberOfEnemyShips; i++)
 					{
 						if (!enemyShips[i].isDead)
 						{
@@ -790,8 +793,8 @@ int main()
 										}
 
 										playerBullets[e].inStorage = true;
-										playerBullets[e].posX = window.width + 700;
-										playerBullets[e].posY = window.height +700;
+										playerBullets[e].posX = GetRenderWidth() + 700;
+										playerBullets[e].posY = GetRenderHeight() +700;
 										playerBullets[e].Xvelocity = 0;
 										enemyShips[i].isDead = true;
 
@@ -873,8 +876,8 @@ int main()
 										}
 
 										playerBullets[e].inStorage = true;
-										playerBullets[e].posX = window.width + 700;
-										playerBullets[e].posY = window.height + 700;
+										playerBullets[e].posX = GetRenderWidth() + 700;
+										playerBullets[e].posY = GetRenderHeight() + 700;
 										playerBullets[e].Xvelocity = 0;
 										enemyHomingShips[i].Xvelocity = 0;
 										enemyHomingShips[i].frame = 0;
@@ -905,8 +908,8 @@ int main()
 								numberOfActiveExplosions++;
 
 								enemyBullets[i].inStorage = true;
-								enemyBullets[i].posX = window.width + 700;
-								enemyBullets[i].posY = window.height + 700;
+								enemyBullets[i].posX = GetRenderWidth() + 700;
+								enemyBullets[i].posY = GetRenderHeight() + 700;
 								enemyBullets[i].Xvelocity = 0;
 								player.hp -= 1;
 							}
@@ -918,18 +921,13 @@ int main()
 
 					player.posY -= player.Yvelocity * dT;
 					player.posX -= player.Xvelocity * dT;
-
-					for (int i = 0; i < numberOfExplosions; i++) {
-						if (explosions[i].isActive) {
-							explosions[i].runningTime += dT;
-						}
-					}
 					player.runningTime += dT;
+
 					for (int i = 0; i < numberOfBugs; i++)
 					{
 						bugs[i].runningTime += dT;
 					}
-					for (int i = 0; i < numberOFEnemyShips; i++)
+					for (int i = 0; i < numberOfEnemyShips; i++)
 					{
 						enemyShips[i].runningTime += dT;
 					}
@@ -941,6 +939,12 @@ int main()
 					{
 						enemyHomingBullets[i].runningTime += dT;
 					}
+					for (int i = 0; i < numberOfExplosions; i++) {
+						if (explosions[i].isActive) {
+							explosions[i].runningTime += dT;
+						}
+					}
+
 					if (player.runningTime >= player.updateTime)
 					{
 						player.runningTime = 0;
@@ -965,8 +969,8 @@ int main()
 							bugs[i].runningTime = 0;
 							if (bugs[i].isDead) {
 								if (bugs[i].currentSprite >= 9 * (bugs[i].width)) {
-									bugs[i].posX = window.width + 250;
-									bugs[i].posY = window.height + 250;
+									bugs[i].posX = GetRenderWidth() + 250;
+									bugs[i].posY = GetRenderHeight() + 250;
 									bugs[i].isCompletedDeath = true;
 								}
 								else if (bugs[i].currentSprite < 5 * (bugs[i].width)) {
@@ -995,15 +999,15 @@ int main()
 					}
 
 					//enemy ship animations + shooting
-					for (int i = 0; i < numberOFEnemyShips; i++)
+					for (int i = 0; i < numberOfEnemyShips; i++)
 					{
 						if (enemyShips[i].runningTime > enemyShips[i].updateTime)
 						{
 							enemyShips[i].runningTime = 0;							
 							if (enemyShips[i].isDead) {
 								if (enemyShips[i].currentSprite >=  21 * (enemyShips[i].width)) {
-									enemyShips[i].posX = window.width + 600;
-									enemyShips[i].posY = window.height + 700;
+									enemyShips[i].posX = GetRenderWidth() + 600;
+									enemyShips[i].posY = GetRenderHeight() + 700;
 									enemyShips[i].isCompletedDeath = true;
 								}
 								else if (enemyShips[i].currentSprite < 5 * (enemyShips[i].width)) {
@@ -1020,7 +1024,7 @@ int main()
 								enemyShips[i].currentSprite = enemyShips[i].frame * enemyShips[i].width;
 								enemyShips[i].frame += enemyShips[i].frameUpdater;
 								enemyShips[i].frameCounter++;
-								if ((enemyShips[i].posX < (window.width + 10)) and (enemyShips[i].frameCounter % enemyShips[i].shootFrame) == 0)
+								if ((enemyShips[i].posX < (GetRenderWidth() + 10)) and (enemyShips[i].frameCounter % enemyShips[i].shootFrame) == 0)
 								{
 									if (numberOfActiveEnemyBullets == numberOfEnemyBullets)
 									{
@@ -1056,8 +1060,8 @@ int main()
 							enemyHomingShips[i].runningTime = 0;
 							if (enemyHomingShips[i].isDead) {
 								if (enemyHomingShips[i].currentSprite >= 18 * (enemyHomingShips[i].width)) {
-									enemyHomingShips[i].posX = window.width + 600;
-									enemyHomingShips[i].posY = window.height + 700;
+									enemyHomingShips[i].posX = GetRenderWidth() + 600;
+									enemyHomingShips[i].posY = GetRenderHeight() + 700;
 									enemyHomingShips[i].isCompletedDeath = true;
 								}
 								else if (enemyHomingShips[i].currentSprite < 5 * (enemyHomingShips[i].width)) {
@@ -1076,7 +1080,7 @@ int main()
 								enemyHomingShips[i].currentSprite = enemyHomingShips[i].frame * enemyHomingShips[i].width;
 								enemyHomingShips[i].frame += enemyHomingShips[i].frameUpdater;
 								enemyHomingShips[i].frameCounter++;
-								if ((enemyHomingShips[i].posX < (window.width + 10)) and (enemyHomingShips[i].frameCounter % enemyHomingShips[i].shootFrame) == 0)
+								if ((enemyHomingShips[i].posX < (GetRenderWidth() + 10)) and (enemyHomingShips[i].frameCounter % enemyHomingShips[i].shootFrame) == 0)
 								{
 									if (numberOfActiveEnemyHomingBullets == numberOfEnemyHomingBullets)
 									{
@@ -1166,7 +1170,7 @@ int main()
 						}
 					}
 					
-					for (int i = 0; i < numberOFEnemyShips; i++)
+					for (int i = 0; i < numberOfEnemyShips; i++)
 					{
 						DrawTextureRec(enemyShipSprite, (Rectangle{ enemyShips[i].currentSprite, 0, enemyShips[i].width, enemyShips[i].height }), (Vector2{ enemyShips[i].posX,enemyShips[i].posY }), WHITE);
 					}
@@ -1225,7 +1229,7 @@ int main()
 						}
 					}
 
-					for (int i = 0; i < numberOFEnemyShips; i++)
+					for (int i = 0; i < numberOfEnemyShips; i++)
 					{
 
 						if (enemyShips[i].isDead)
@@ -1266,7 +1270,7 @@ int main()
 					DrawText(TextFormat("Score: %08i", score), 300, 5, 26, RED);
 
 					if (bossActive and (bossWarning >= bossBattleActivationRunTime)) {
-						DrawText("The Mothership Draws Closer...", window.width / 2, window.height / 2, 50, RED);
+						DrawText("The Mothership Draws Closer...", GetRenderWidth() / 2, GetRenderHeight() / 2, 50, RED);
 					}
 
 					EndDrawing();
