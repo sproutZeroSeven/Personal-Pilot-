@@ -1146,7 +1146,7 @@ int main()
 					//draw background first
 					//DrawTextureEx(bg, { BGposX,0 }, 0, 145 / 100, WHITE);
 					//DrawTextureEx(bg, { (BGposX + (bg.width * (145 / 100))),0 }, 0, (145 / 100), WHITE);
-					DrawTexturePro(bg, (Rectangle{ BGposX, 0, 512 + (windowWidth/16), 380 + (windowHeight/9) }), (Rectangle{ BGposX, 0, windowWidth, windowHeight }), (Vector2{ 0,0 }), 0, WHITE);
+					DrawTexturePro(bg, (Rectangle{ BGposX, 0, 512 + (windowWidth/16), 380 + (windowHeight/9) }), (Rectangle{ 0, 0, windowWidth, windowHeight }), (Vector2{ 0,0 }), 0, WHITE);
 
 					for (int i = 0; i < numberOfBugs; i++)
 					{
