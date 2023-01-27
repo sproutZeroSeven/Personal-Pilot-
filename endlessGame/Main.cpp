@@ -161,17 +161,14 @@ struct bossMotherShip {
 }motherShip;
 
 int main()
-<<<<<<< HEAD
+
 {	
 	InitWindow(window.width, window.height, window.title);
 	ToggleFullscreen();
 	InitAudioDevice();
 	SetMasterVolume(100);
 
-=======
-{
 	//Variables
->>>>>>> d67a271fe0766570a10756f2ac88e660d4658ffc
 	bool startGame = false, mainMenu = true, bossActive = false;
 	int numberOfActivePlayerBullets = 0, numberOfActiveEnemyBullets = 0, numberOfActiveEnemyHomingBullets = 0, numberOfActiveExplosions = 0, bossBattleActivationTime, bossWarning = 0;
 	float bossBattleActivationRunTime = 0, BGposX = 0, windowWidth = GetRenderWidth(), windowHeight = GetRenderHeight();
@@ -285,17 +282,14 @@ int main()
 			//doesn't work as a bg so i drew it as a sprite
 
 			//DrawTexturePro(sMenuBg, (Rectangle{ startMenuFrame, 0, 512, 380 }), (Rectangle((startMenuFrame * (window.height / 380)), 0, 512 * (window.height / 380), 380 * (window.height / 380))), (Vector2{ 0, 0 }), 0, WHITE);
-<<<<<<< HEAD
 			DrawTexturePro(sMenuBg, (Rectangle{ startMenuFrame, 0, 512, 380 }), (Rectangle{ 0, 0, 512 * (windowWidth / 512), 380 * (windowHeight / 380) }), (Vector2{ 0, 0}), 0, WHITE);
 
 			DrawTexturePro(sMenuOptions, (Rectangle{ sMenuOptionSelected, 0, 189, 127 }), (Rectangle{ 0, 0, 189 * (windowHeight / 380), 127 * (windowHeight / 380) }), (Vector2{ (-windowWidth + (189 * (windowHeight / 380)) + (windowHeight / 16)), (-windowHeight + (127 * (windowHeight / 380)) + (windowHeight / 16)) }), 0, WHITE);
 
 			DrawText("By Kylar McLean & Carter Newman", (5), (0), 17, SKYBLUE);
-=======
 			DrawTextureRec(sMenuBg, (Rectangle{ startMenuFrame, 0, 512, 380 }), (Vector2{ 0, 0 }), WHITE);
 			DrawTextureRec(sMenuOptions, (Rectangle{ sMenuOptionSelected, 0, 189, 127 }), (Vector2{ 290, 240 }), WHITE);
 			DrawText("By Kylar McLean & Carter Newman", (5), (360), 17, SKYBLUE); //Draws starting menu
->>>>>>> d67a271fe0766570a10756f2ac88e660d4658ffc
 
 
 			EndDrawing();
@@ -303,7 +297,7 @@ int main()
 		else if (startGame)
 		{	
 			//ToggleFullscreen();       
-
+			StopSoundMulti();
 			score = 0;
 			player.hp = 3;
 			player.posY = GetRenderHeight() / 2;
@@ -372,13 +366,8 @@ int main()
 				playerBullets[i].currentSprite = i * 8;
 			} 
 
-<<<<<<< HEAD
 			const int numberOfEnemyBullets = 75;
-
-=======
-			const int numberOfEnemyBullets = 40;
 				//Set to template
->>>>>>> d67a271fe0766570a10756f2ac88e660d4658ffc
 			bullets enemyBullets[numberOfEnemyBullets];
 			for (int i = 0; i < numberOfEnemyBullets; i++)
 			{
@@ -418,12 +407,8 @@ int main()
 					if (bossBattleActivationTime < bossBattleActivationRunTime) {
 						bossActive = true;
 					}
-<<<<<<< HEAD
-					//begin drawin
-=======
 
 					//Begin Drawing
->>>>>>> d67a271fe0766570a10756f2ac88e660d4658ffc
 					BeginDrawing();
 					ClearBackground(WHITE);
 
@@ -1302,19 +1287,16 @@ int main()
 					}
 
 					char textScore[6] = "score";
-<<<<<<< HEAD
 					DrawText(TextFormat("Score: %08i", score), GetRenderWidth()- (MeasureText(TextFormat("Score: %08i", score), 26 + (GetRenderWidth() / 160))), 5, 26 + (GetRenderWidth()/160), RED);
 
 					//if (bossActive and (bossWarning >= bossBattleActivationRunTime)) {
 					//	DrawText("The Mothership Draws Closer...", GetRenderWidth() / 2 - 0.5*(MeasureText("The Mothership Draws Closer...", 50 + (GetRenderWidth() / 160))), GetRenderHeight() / 2, 50 + (GetRenderWidth() / 160), RED);
 					//}
-=======
 					DrawText(TextFormat("Score: %08i", score), 300, 5, 26, RED); //Prints Score
 
 					if (bossActive and (bossWarning >= bossBattleActivationRunTime)) {
 						DrawText("The Mothership Draws Closer...", GetRenderWidth() / 2, GetRenderHeight() / 2, 50, RED); //Warns the player of a boss battle
 					}
->>>>>>> d67a271fe0766570a10756f2ac88e660d4658ffc
 
 					EndDrawing();
 
