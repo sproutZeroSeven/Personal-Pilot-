@@ -603,7 +603,7 @@ int main()
 						}
 					}
 
-					if ((IsKeyPressed(KEY_ESCAPE))) //Quits game if escape is pressed
+					if ((IsKeyPressed(KEY_ESCAPE)))
 					{
 						bool looping = true;
 						while (looping)
@@ -637,7 +637,7 @@ int main()
 					};
 
 
-					for (int i = 0; i < numberOfBugs; i++) //enemy box colliders
+					for (int i = 0; i < numberOfBugs; i++)
 					{
 
 
@@ -857,7 +857,7 @@ int main()
 							}
 							else
 							{
-								for (int e = 0; e < numberOfPlayerBullets; e++) //Moves bullets out of screen when they hit an enemy
+								for (int e = 0; e < numberOfPlayerBullets; e++)
 								{
 									Rectangle playerBulletRec
 									{
@@ -889,7 +889,7 @@ int main()
 							}
 						}
 					}
-					for (int i = 0; i < numberOfEnemyBullets; i++) 
+					for (int i = 0; i < numberOfEnemyBullets; i++)
 					{
 						if (!enemyBullets[i].inStorage)
 						{
@@ -901,7 +901,7 @@ int main()
 							   (enemyBullets[i].height - 2)
 							};
 
-							if ((CheckCollisionRecs(enemyBulletRec, playerFrontWingRec)) or (CheckCollisionRecs(enemyBulletRec, playerBackWingRec)) or (CheckCollisionRecs(enemyBulletRec, playerLengthRec))) //Moves bullets out of screen when they hit an enemy
+							if ((CheckCollisionRecs(enemyBulletRec, playerFrontWingRec)) or (CheckCollisionRecs(enemyBulletRec, playerBackWingRec)) or (CheckCollisionRecs(enemyBulletRec, playerLengthRec)))
 							{
 								explosions[numberOfActiveExplosions].posX = enemyBullets[i].posX;
 								explosions[numberOfActiveExplosions].posY = enemyBullets[i].posY;
