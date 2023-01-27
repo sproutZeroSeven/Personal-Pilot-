@@ -8,7 +8,7 @@
 struct Window 
 {
 	int width = GetScreenWidth();
-	int height = GetScreenHeight();
+	int height =  GetScreenHeight();
 	const char* title = "Personal Pilot!";
 }window;
 
@@ -161,24 +161,14 @@ struct bossMotherShip {
 }motherShip;
 
 int main()
-<<<<<<< HEAD
-{	
-	InitWindow(window.width, window.height, window.title);
-	ToggleFullscreen();
-	InitAudioDevice();
-	SetMasterVolume(100);
-
-=======
 {
 	//Variables
->>>>>>> d67a271fe0766570a10756f2ac88e660d4658ffc
 	bool startGame = false, mainMenu = true, bossActive = false;
-	int numberOfActivePlayerBullets = 0, numberOfActiveEnemyBullets = 0, numberOfActiveEnemyHomingBullets = 0, numberOfActiveExplosions = 0, bossBattleActivationTime, bossWarning = 0;
-	float bossBattleActivationRunTime = 0, BGposX = 0, windowWidth = GetRenderWidth(), windowHeight = GetRenderHeight();
-
+	int numberOfActivePlayerBullets = 0, numberOfActiveEnemyBullets = 0, numberOfActiveEnemyHomingBullets = 0, numberOfActiveExplosions = 0, bossBattleActivationTime, bossBattleActivationRunTime = 0, bossWarning;
+	float difference, BGposX = 0;
 
 	//sets the window dimensions
-
+	InitWindow(window.width, window.height, window.title);
 	Texture2D sprite = LoadTexture("gameAssets/playerShips/rocketshipBlue(60x28).png");
 
 
@@ -196,7 +186,7 @@ int main()
 	Texture2D motherShipBeam = LoadTexture("gameAssets/bosses/motherShipBeam(200x289).png");
 
 	//backround texture
-	Texture2D bg = LoadTexture("gameAssets/spaceBG(2000x1000).png");
+	Texture2D bg = LoadTexture("gameAssets/spaceBG(1500x380).png");
 
 	//player bullets texture
 	Texture2D playerBulletTexture = LoadTexture("gameAssets/projectiles/playerPellets(8x6).png");
@@ -216,12 +206,8 @@ int main()
 
 	Texture2D dMenuOptions = LoadTexture("gameAssets/menus/deathScreen/options(189x127).png");
 
-	Sound laser = LoadSound("gameAssets/sounds/laserEffect.mp3");
-	Sound rickroll = LoadSound("gameAssets/sounds/rickroll.mp3");
-
-
 	float  startMenuFrame = 0, sMenuOptionSelected = 0, startMenuRunningTime = 0, dMenuOptionSelected = 0;
-	int startMenuFrameChange = 512, sMenuOptionWidth = 189, dMenuOptionWidth = 189, score = 0;
+	int startMenuFrameChange = GetRenderWidth(), sMenuOptionWidth = 189, dMenuOptionWidth = 189, score = 0;
 
 	SetTargetFPS(60);
 	while (!(WindowShouldClose())) 
@@ -239,10 +225,10 @@ int main()
 				//reset frame and set sprite to middle animation to loop
 				if (startMenuFrame >= GetRenderWidth() * 3)
 				{
-					startMenuFrameChange = -startMenuFrameChange;
+					startMenuFrameChange = -GetRenderWidth();
 				}
 				else if (startMenuFrame <= 0) {
-					startMenuFrameChange = -startMenuFrameChange;
+					startMenuFrameChange = GetRenderWidth();
 				}
 			}
 
@@ -269,7 +255,7 @@ int main()
 				}
 				else if (optionSelected == 2)
 				{
-					ToggleFullscreen();
+
 				}
 				else if (optionSelected == 3)
 				{
@@ -285,17 +271,9 @@ int main()
 			//doesn't work as a bg so i drew it as a sprite
 
 			//DrawTexturePro(sMenuBg, (Rectangle{ startMenuFrame, 0, 512, 380 }), (Rectangle((startMenuFrame * (window.height / 380)), 0, 512 * (window.height / 380), 380 * (window.height / 380))), (Vector2{ 0, 0 }), 0, WHITE);
-<<<<<<< HEAD
-			DrawTexturePro(sMenuBg, (Rectangle{ startMenuFrame, 0, 512, 380 }), (Rectangle{ 0, 0, 512 * (windowWidth / 512), 380 * (windowHeight / 380) }), (Vector2{ 0, 0}), 0, WHITE);
-
-			DrawTexturePro(sMenuOptions, (Rectangle{ sMenuOptionSelected, 0, 189, 127 }), (Rectangle{ 0, 0, 189 * (windowHeight / 380), 127 * (windowHeight / 380) }), (Vector2{ (-windowWidth + (189 * (windowHeight / 380)) + (windowHeight / 16)), (-windowHeight + (127 * (windowHeight / 380)) + (windowHeight / 16)) }), 0, WHITE);
-
-			DrawText("By Kylar McLean & Carter Newman", (5), (0), 17, SKYBLUE);
-=======
 			DrawTextureRec(sMenuBg, (Rectangle{ startMenuFrame, 0, 512, 380 }), (Vector2{ 0, 0 }), WHITE);
 			DrawTextureRec(sMenuOptions, (Rectangle{ sMenuOptionSelected, 0, 189, 127 }), (Vector2{ 290, 240 }), WHITE);
 			DrawText("By Kylar McLean & Carter Newman", (5), (360), 17, SKYBLUE); //Draws starting menu
->>>>>>> d67a271fe0766570a10756f2ac88e660d4658ffc
 
 
 			EndDrawing();
@@ -305,7 +283,7 @@ int main()
 			//ToggleFullscreen();       
 
 			score = 0;
-			player.hp = 3;
+			player.hp = 1;
 			player.posY = GetRenderHeight() / 2;
 			int distanceTravelled = 0;
 			const int numberOfBugs = 12;
@@ -328,8 +306,8 @@ int main()
 			const int numberOfEnemyShips = 12;
 			enemyShip enemyShips[numberOfEnemyShips];
 
-			bossBattleActivationTime = ((static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (30)))+25)*2;
-			bossWarning = bossBattleActivationTime + 2;
+			bossBattleActivationTime = 1/(static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (3)))+5;
+			bossWarning = bossBattleActivationTime + 3;
 
 			for (int i = 0; i < numberOfEnemyShips; i++)
 			{
@@ -364,7 +342,7 @@ int main()
 				enemyHomingShips[i].shootFrame = ((static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (16))) + 16);
 			}
 
-			const int numberOfPlayerBullets = 75;
+			const int numberOfPlayerBullets = 24;
 
 			bullets playerBullets[numberOfPlayerBullets];
 			for (int i = 0; i < numberOfPlayerBullets; i++)
@@ -372,13 +350,8 @@ int main()
 				playerBullets[i].currentSprite = i * 8;
 			} 
 
-<<<<<<< HEAD
-			const int numberOfEnemyBullets = 75;
-
-=======
 			const int numberOfEnemyBullets = 40;
 				//Set to template
->>>>>>> d67a271fe0766570a10756f2ac88e660d4658ffc
 			bullets enemyBullets[numberOfEnemyBullets];
 			for (int i = 0; i < numberOfEnemyBullets; i++)
 			{
@@ -387,7 +360,7 @@ int main()
 				enemyBullets[i].baseVelocity = 200;
 			} 
 
-			const int numberOfEnemyHomingBullets = 75;
+			const int numberOfEnemyHomingBullets = 15;
 			bullets enemyHomingBullets[numberOfEnemyHomingBullets];
 			for (int i = 0; i < numberOfEnemyHomingBullets; i++)
 			{	//Set to template
@@ -396,7 +369,7 @@ int main()
 				enemyHomingBullets[i].baseVelocity = -100;
 				enemyHomingBullets[i].isHoming = true;
 
-				enemyHomingBullets[i].updateTime = 1.0 / (((static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (12)))));
+				enemyHomingBullets[i].updateTime = 1.0 / ((static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (6))) + 6);
 
 				enemyHomingBullets[i].posX = GetRenderWidth() + 200;
 				enemyHomingBullets[i].posY = GetRenderHeight() + 200;
@@ -418,12 +391,8 @@ int main()
 					if (bossBattleActivationTime < bossBattleActivationRunTime) {
 						bossActive = true;
 					}
-<<<<<<< HEAD
-					//begin drawin
-=======
 
 					//Begin Drawing
->>>>>>> d67a271fe0766570a10756f2ac88e660d4658ffc
 					BeginDrawing();
 					ClearBackground(WHITE);
 
@@ -620,7 +589,6 @@ int main()
 
 					if ((IsKeyPressed(KEY_SPACE))) //shoots bullets
 					{
-						PlaySoundMulti(laser);
 						if (numberOfActivePlayerBullets == numberOfPlayerBullets)
 						{
 							numberOfActivePlayerBullets = 0;
@@ -635,7 +603,7 @@ int main()
 						}
 					}
 
-					if ((IsKeyPressed(KEY_ESCAPE))) //Quits game if escape is pressed
+					if ((IsKeyPressed(KEY_ESCAPE)))
 					{
 						bool looping = true;
 						while (looping)
@@ -644,9 +612,6 @@ int main()
 						}
 					}
 
-					if (IsKeyPressed(KEY_R)) {
-						OpenURL("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
-					}
 
 					//player box colliders
 					Rectangle playerFrontWingRec
@@ -672,7 +637,7 @@ int main()
 					};
 
 
-					for (int i = 0; i < numberOfBugs; i++) //enemy box colliders
+					for (int i = 0; i < numberOfBugs; i++)
 					{
 
 
@@ -892,7 +857,7 @@ int main()
 							}
 							else
 							{
-								for (int e = 0; e < numberOfPlayerBullets; e++) //Moves bullets out of screen when they hit an enemy
+								for (int e = 0; e < numberOfPlayerBullets; e++)
 								{
 									Rectangle playerBulletRec
 									{
@@ -924,7 +889,7 @@ int main()
 							}
 						}
 					}
-					for (int i = 0; i < numberOfEnemyBullets; i++) 
+					for (int i = 0; i < numberOfEnemyBullets; i++)
 					{
 						if (!enemyBullets[i].inStorage)
 						{
@@ -936,7 +901,7 @@ int main()
 							   (enemyBullets[i].height - 2)
 							};
 
-							if ((CheckCollisionRecs(enemyBulletRec, playerFrontWingRec)) or (CheckCollisionRecs(enemyBulletRec, playerBackWingRec)) or (CheckCollisionRecs(enemyBulletRec, playerLengthRec))) //Moves bullets out of screen when they hit an enemy
+							if ((CheckCollisionRecs(enemyBulletRec, playerFrontWingRec)) or (CheckCollisionRecs(enemyBulletRec, playerBackWingRec)) or (CheckCollisionRecs(enemyBulletRec, playerLengthRec)))
 							{
 								explosions[numberOfActiveExplosions].posX = enemyBullets[i].posX;
 								explosions[numberOfActiveExplosions].posY = enemyBullets[i].posY;
@@ -1172,12 +1137,13 @@ int main()
 						}
 					}
 
-					BGposX -= 30 * dT;
-					if (BGposX <= -(2000))
+					BGposX -= 40 * dT;
+					distanceTravelled += 40 * dT;
+					if (BGposX <= -(1500))
 					{
 						BGposX = 0;
 					}
-
+					float windowWidth = GetRenderWidth(), windowHeight = GetRenderHeight();
 					//draw background first
 					//DrawTextureEx(bg, { BGposX,0 }, 0, 145 / 100, WHITE);
 					//DrawTextureEx(bg, { (BGposX + (bg.width * (145 / 100))),0 }, 0, (145 / 100), WHITE);
@@ -1211,7 +1177,7 @@ int main()
 						DrawTextureRec(enemyShipSprite, (Rectangle{ enemyShips[i].currentSprite, 0, enemyShips[i].width, enemyShips[i].height }), (Vector2{ enemyShips[i].posX,enemyShips[i].posY }), WHITE);
 					}
 
-					for (int i = 0; i < numberOfEnemyHomingShips; i++)
+					for (int i = 0; i < numberOfEnemyHomingBullets; i++)
 					{
 						DrawTextureRec(enemyHomingShipSprite, (Rectangle{ enemyHomingShips[i].currentSprite, 0, enemyHomingShips[i].width, enemyHomingShips[i].height }), (Vector2{ enemyHomingShips[i].posX,enemyHomingShips[i].posY }), WHITE);
 					}
@@ -1247,7 +1213,7 @@ int main()
 						}
 					}
 					DrawTextureRec(sprite, (Rectangle{ player.currentSprite, 0, player.width, player.height }), (Vector2{ player.posX, player.posY }), WHITE);
-					//DrawCircle(player.posX, player.posY, 1, PINK);
+					DrawCircle(player.posX, player.posY, 1, PINK);
 
 
 					for (int i = 0; i < numberOfBugs; i++) //Increases score when enemies die
@@ -1302,26 +1268,17 @@ int main()
 					}
 
 					char textScore[6] = "score";
-<<<<<<< HEAD
-					DrawText(TextFormat("Score: %08i", score), GetRenderWidth()- (MeasureText(TextFormat("Score: %08i", score), 26 + (GetRenderWidth() / 160))), 5, 26 + (GetRenderWidth()/160), RED);
-
-					//if (bossActive and (bossWarning >= bossBattleActivationRunTime)) {
-					//	DrawText("The Mothership Draws Closer...", GetRenderWidth() / 2 - 0.5*(MeasureText("The Mothership Draws Closer...", 50 + (GetRenderWidth() / 160))), GetRenderHeight() / 2, 50 + (GetRenderWidth() / 160), RED);
-					//}
-=======
 					DrawText(TextFormat("Score: %08i", score), 300, 5, 26, RED); //Prints Score
 
 					if (bossActive and (bossWarning >= bossBattleActivationRunTime)) {
 						DrawText("The Mothership Draws Closer...", GetRenderWidth() / 2, GetRenderHeight() / 2, 50, RED); //Warns the player of a boss battle
 					}
->>>>>>> d67a271fe0766570a10756f2ac88e660d4658ffc
 
 					EndDrawing();
 
 					if (player.hp <= 0)
 					{
 						startGame = false;
-						PlaySoundMulti(rickroll);
 						break;
 					}
 				}
@@ -1330,11 +1287,8 @@ int main()
 		else //Death menu when player dies
 		{	
 			BeginDrawing();
-			DrawText("You Died", (GetRenderWidth()/2) - MeasureText("You Died" , 30 + (GetRenderWidth() / 16)), GetRenderHeight()/2, 30 + (GetRenderWidth() / 16), WHITE);
-
-			//DrawTextureRec(dMenuOptions, (Rectangle{ dMenuOptionSelected, 0, 189, 127 }), (Vector2{ 303, 233 }), WHITE);
-			DrawTexturePro(dMenuOptions, (Rectangle{ dMenuOptionSelected, 0, 189, 127 }), (Rectangle{ 0, 0, 189*(windowHeight/380), 127*(windowHeight/380) }), (Vector2{(-windowWidth+(189 * (windowHeight / 380)) +(windowHeight/16)), (-windowHeight + (127 * (windowHeight / 380)) + (windowHeight / 16))}), 0, WHITE);
-
+			DrawText("You Died", 256, 190, 20, WHITE);
+			DrawTextureRec(dMenuOptions, (Rectangle{ dMenuOptionSelected, 0, 189, 127 }), (Vector2{ 303, 233 }), WHITE);
 			if ((IsKeyPressed(KEY_DOWN)) or (IsKeyPressed(KEY_S)))
 			{
 				dMenuOptionSelected += dMenuOptionWidth;
