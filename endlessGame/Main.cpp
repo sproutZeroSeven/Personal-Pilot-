@@ -976,7 +976,7 @@ int main()
 					{
 						player.runningTime = 0;
 
-						if (player.frame > 3) {
+						if (player.frame > 3 and player.hp >1 and player.hp >=3) {
 							player.updateTime = 1.0 / 16.0;
 							player.frame += 1;
 							player.currentSprite = player.frame * player.width;
