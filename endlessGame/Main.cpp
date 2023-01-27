@@ -32,7 +32,7 @@ struct character
 	
 	//animation data
 	
-	int frame = 2;
+	int frame = 0;
 	int startFrame = 2;
 	int maxFrame = 5;
 	float currentSprite = 162;
@@ -189,8 +189,8 @@ int main()
 
 	Texture2D enemyHomingShipSprite = LoadTexture("gameAssets/enemies/enemySpaceShips/EnemyHomingShip(60x33).png");
 
-	Texture2D motherShipBody = LoadTexture("gameAssets/bosses/motherShipBase(199x57).png");
-	Texture2D motherShipBeam = LoadTexture("gameAssets/bosses/motherShipBeam(200x289).png");
+	//Texture2D motherShipBody = LoadTexture("gameAssets/bosses/motherShipBase(199x57).png");
+	//Texture2D motherShipBeam = LoadTexture("gameAssets/bosses/motherShipBeam(200x289).png");
 
 	//backround texture
 	Texture2D bg = LoadTexture("gameAssets/spaceBG(2000x1000).png");
@@ -286,10 +286,7 @@ int main()
 
 			DrawTexturePro(sMenuOptions, (Rectangle{ sMenuOptionSelected, 0, 189, 127 }), (Rectangle{ 0, 0, 189 * (windowHeight / 380), 127 * (windowHeight / 380) }), (Vector2{ (-windowWidth + (189 * (windowHeight / 380)) + (windowHeight / 16)), (-windowHeight + (127 * (windowHeight / 380)) + (windowHeight / 16)) }), 0, WHITE);
 
-			DrawText("By Kylar McLean & Carter Newman", (5), (0), 17, SKYBLUE);
-			DrawTextureRec(sMenuBg, (Rectangle{ startMenuFrame, 0, 512, 380 }), (Vector2{ 0, 0 }), WHITE);
-			DrawTextureRec(sMenuOptions, (Rectangle{ sMenuOptionSelected, 0, 189, 127 }), (Vector2{ 290, 240 }), WHITE);
-			DrawText("By Kylar McLean & Carter Newman", (5), (360), 17, SKYBLUE); //Draws starting menu
+			DrawText("By Kylar McLean & Carter Newman", (5), (0), 17, SKYBLUE);//Draws starting menu
 
 
 			EndDrawing();
@@ -299,9 +296,7 @@ int main()
 			//ToggleFullscreen();       
 			StopSoundMulti();
 			score = 0;
-			player.hp = 3;
-			player.posY = GetRenderHeight() / 2;
-			int distanceTravelled = 0;
+			
 			const int numberOfBugs = 12;
 			character bugs[numberOfBugs];
 			srand(time(0));
@@ -393,6 +388,12 @@ int main()
 
 			const int numberOfExplosions = 24;
 			points explosions[numberOfExplosions];
+
+			player.hp = 3;
+			player.frame = 0;
+			player.currentSprite = 0;
+			player.posX = 0;
+			player.posY = GetRenderHeight() / 2;
 
 			while (!(WindowShouldClose()))//Game
 			{
@@ -680,6 +681,7 @@ int main()
 						{
 							if ((CheckCollisionRecs(bugBodyrec, playerLengthRec) or CheckCollisionRecs(bugBodyrec, playerBackWingRec) or CheckCollisionRecs(bugBodyrec, playerFrontWingRec)) or (CheckCollisionRecs(bugAntennaRec, playerLengthRec) or CheckCollisionRecs(bugAntennaRec, playerBackWingRec) or CheckCollisionRecs(bugAntennaRec, playerFrontWingRec))) {
 								player.hp -= 1;
+								player.frame = 3;
 								bugs[i].currentSprite = 6 * bugs[i].width;
 								bugs[i].hp = 0;
 								bugs[i].Xvelocity = 0;
@@ -749,6 +751,7 @@ int main()
 							if ((CheckCollisionRecs(homingBulletMainMass, playerLengthRec) or CheckCollisionRecs(homingBulletMainMass, playerBackWingRec) or CheckCollisionRecs(homingBulletMainMass, playerFrontWingRec)) or (CheckCollisionRecs(homingBulletSecondaryMass, playerLengthRec) or CheckCollisionRecs(homingBulletSecondaryMass, playerBackWingRec) or CheckCollisionRecs(homingBulletSecondaryMass, playerFrontWingRec)))
 							{
 								player.hp -= 1;
+								player.frame = 3;
 								enemyHomingBullets[i].inStorage = true;
 								enemyHomingBullets[i].isHoming = false;
 								enemyHomingBullets[i].posX = GetRenderWidth() + 700; 
@@ -786,6 +789,7 @@ int main()
 							if ((CheckCollisionRecs(enemyShipFrontWingRec, playerLengthRec) or CheckCollisionRecs(enemyShipFrontWingRec, playerBackWingRec) or CheckCollisionRecs(enemyShipFrontWingRec, playerFrontWingRec)) or (CheckCollisionRecs(enemyShipBackWingRec, playerLengthRec) or CheckCollisionRecs(enemyShipBackWingRec, playerBackWingRec) or CheckCollisionRecs(enemyShipBackWingRec, playerFrontWingRec)) or (CheckCollisionRecs(enemyShipLengthRec, playerLengthRec) or CheckCollisionRecs(enemyShipLengthRec, playerBackWingRec) or CheckCollisionRecs(enemyShipLengthRec, playerFrontWingRec)))
 							{
 								player.hp -= 1;
+								player.frame = 3;
 								//enemyShips[i].currentSprite = 6 * bugs[i].enemyShips;
 								enemyShips[i].hp = 0;
 								enemyShips[i].Xvelocity = 0;
@@ -870,6 +874,7 @@ int main()
 							if ((CheckCollisionRecs(enemyHomingShipWingRec, playerLengthRec) or CheckCollisionRecs(enemyHomingShipWingRec, playerBackWingRec) or CheckCollisionRecs(enemyHomingShipWingRec, playerFrontWingRec)) or (CheckCollisionRecs(homingShipMainHeightRec, playerLengthRec) or CheckCollisionRecs(homingShipMainHeightRec, playerBackWingRec) or CheckCollisionRecs(homingShipMainHeightRec, playerFrontWingRec)) or (CheckCollisionRecs(HomingShipLengthRec, playerLengthRec) or CheckCollisionRecs(HomingShipLengthRec, playerBackWingRec) or CheckCollisionRecs(HomingShipLengthRec, playerFrontWingRec)))
 							{
 								player.hp -= 1;
+								player.frame = 3;
 								//enemyShips[i].currentSprite = 6 * bugs[i].enemyShips;
 								enemyHomingShips[i].Xvelocity = 0;
 								enemyHomingShips[i].frame = 0;
@@ -933,6 +938,7 @@ int main()
 								enemyBullets[i].posY = GetRenderHeight() + 700;
 								enemyBullets[i].Xvelocity = 0;
 								player.hp -= 1;
+								player.frame = 3;
 							}
 						}
 					}
@@ -969,17 +975,31 @@ int main()
 					if (player.runningTime >= player.updateTime)
 					{
 						player.runningTime = 0;
-						//updates the sprite
-						player.currentSprite = player.frame * player.width;
-						player.frame += player.frameUpdater;
-						//reset frame and set sprite to middle animation to loop
-						if (player.frame > 1 and (player.frameUpdater == 1))
-						{
-							player.frameUpdater = -1;
+
+						if (player.frame > 3) {
+							player.updateTime = 1.0 / 16.0;
+							player.frame += 1;
+							player.currentSprite = player.frame * player.width;
+							player.frame += 1;
+							if (player.frame > 7) {
+								player.frame = 0;
+								player.updateTime = 1.0 / 4.0;
+
+							}
 						}
-						else if ((player.frame == 0) and (player.frameUpdater == -1)) {
-							player.frameUpdater = 1;
-							player.frame = 0;
+						else {
+							//updates the sprite
+							player.currentSprite = player.frame * player.width;
+							player.frame += player.frameUpdater;
+							//reset frame and set sprite to middle animation to loop
+							if (player.frame > 1 and (player.frameUpdater == 1))
+							{
+								player.frameUpdater = -1;
+							}
+							else if ((player.frame == 0) and (player.frameUpdater == -1)) {
+								player.frameUpdater = 1;
+								player.frame = 0;
+							}
 						}
 					}
 
@@ -1231,6 +1251,7 @@ int main()
 							}
 						}
 					}
+					
 					DrawTextureRec(sprite, (Rectangle{ player.currentSprite, 0, player.width, player.height }), (Vector2{ player.posX, player.posY }), WHITE);
 					//DrawCircle(player.posX, player.posY, 1, PINK);
 
@@ -1292,7 +1313,6 @@ int main()
 					//if (bossActive and (bossWarning >= bossBattleActivationRunTime)) {
 					//	DrawText("The Mothership Draws Closer...", GetRenderWidth() / 2 - 0.5*(MeasureText("The Mothership Draws Closer...", 50 + (GetRenderWidth() / 160))), GetRenderHeight() / 2, 50 + (GetRenderWidth() / 160), RED);
 					//}
-					DrawText(TextFormat("Score: %08i", score), 300, 5, 26, RED); //Prints Score
 
 					if (bossActive and (bossWarning >= bossBattleActivationRunTime)) {
 						DrawText("The Mothership Draws Closer...", GetRenderWidth() / 2, GetRenderHeight() / 2, 50, RED); //Warns the player of a boss battle
